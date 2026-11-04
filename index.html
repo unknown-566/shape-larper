@@ -54,14 +54,11 @@ function go(){if(CFG.wm&&!WM)return wmStart(go);prac=0;newGame()}
 function startPrac(i){if(CFG.wm&&!WM)return wmStart(()=>startPrac(i));PB=i;newGame();prac=1;THR=i==NB?1:0;stage=Math.min(i,NB-1);DEBT=THR?[0,3,6][PL]:0;wave=2;spawnQ=[];NP=[0,4,9][PL];for(let k=0;k<NP;k++)UP[R()*UP.length|0][2]();P.hp=P.mhp;ban=null;begin()}
 function retry(){prac?startPrac(PB):go()}
 function toMenu(){wmStop();S='title';P=null;boss=null;E=[];B=[];LZ=[];BR=[];PT=[];FT=[];RG=[];ban=null;prac=0;spawnQ=[];adv=0}
-function btn(l,x,y,w,h,f,o={}){const hv=MU.x>x&&MU.x<x+w&&MU.y>y&&MU.y<y+h;BT.push({x,y,w,h,f,v:CW});g.fillStyle=hv?'#221c4d':'#130f2d';g.strokeStyle=o.sel?'#ffe14a':hv?'#5ef2ff':'#3a3566';g.lineWidth=2;g.fillRect(x,y,w,h);g.strokeRect(x,y,w,h);T(l,x+w/2,y+h/2,o.sz||18,o.c||(hv?'#fff':'#d8d4ff'))}
+function btn(l,x,y,w,h,f,o={}){const hv=MU.x>x&&MU.x<x+w&&MU.y>y&&MU.y<y+h;BT.push({x,y,w,h,f,v:CW});btnBox(x,y,w,h,hv,o.sel);T(l,x+w/2,y+h/2,o.sz||18,o.c||(hv?'#fff':'#d8d4ff'))}
 function wr(s,x,y,w,lh,c,sz){g.font=`${sz}px ${F}`;let ln='',yy=y;for(const wd of s.split(' ')){const tt=ln?ln+' '+wd:wd;if(g.measureText(tt).width>w&&ln){T(ln,x,yy,sz,c,'left','normal');ln=wd;yy+=lh}else ln=tt}T(ln,x,yy,sz,c,'left','normal');return yy+lh}
 const BD=[['First guardian of the Gauntlet. Fires rings and aimed fans, then a spiral when hurt.','The gold-ringed center shot ignores orbs. Dodge it.'],['Keeper of the swarm. Summons chasers, rains bullets and charges along a red line.','Leave the red line before it fires.'],['Heart of the Gauntlet. Spirals, rings and walls of red diamonds with a single gap.','Walls cannot be erased. Find the gap.'],['Guardian of the ring. Armored while it drops mines from above, exposed when it lands.','Save your damage for the landing.'],['Voice of the storm. Teleports and calls down telegraphed lasers.','Dash through a beam as it fires.'],['Warden of the sixth seal. Spirals, walls, lasers and fans, all at once.','Watch for the wall and keep a dash ready.'],['Devourer of light. Drags you in, then detonates in rings.','Dash out when the gold ring collapses.']];
 function ENTS(){return[['e0','Chaser','#ff4fa3',3,'Rushes straight at you. Fragile, but they come in swarms.','Keep moving and thin them out.'],['e1','Shooter','#ffb84f',4,'Keeps its distance and fires aimed shots, in threes from sector 2.','Strafe sideways and kill them early.'],['e2','Bomber','#b06cff',6,'Slow and sturdy. Bursts into a ring of bullets when it dies.','Kill it at range, or dash through the ring.'],['e3','Charger','#5effa0',5,'Flashes, then lunges across the arena at high speed.','Sidestep the flash, then punish it.'],['e4','Spinner','#ff7a45',8,'A stationary turret firing rotating streams of bullets.','Find the gaps and kill it from the side.'],['e5','Bulwark','#ffd24a',7,'Slow and tanky. Fires big gold-ringed bullets that ignore orbs.','A pulse or a dodge. Orbs will not help.'],['e6','Splitter','#3ee0ff',10,'Splits into three chasers when killed.','Kill it away from you.'],['e7','Sniper','#ff5df0',3,'Hangs back and paints you with a laser sight, then fires one very fast shot.','When the line turns white, step off it.'],['e8','Blinker','#a0ffef',4,'Marks a spot near you, teleports there and bursts into a ring.','Watch for the growing circle and leave it.'],['e9','Weaver','#ff9de2',9,'Weaves toward you and drops mines that burst after a moment.','Do not fight it where it has been.'],...BS.map((b,i)=>['b'+i,b[0],b[1],[6,8,5,7,3,10,9][i]||6,...(BD[i]||['Unknown guardian.',''])]),['b7',FB[0],FB[1],12,...FBD],['t1','Gold-ringed bullet','#ffe08a',0,'Heavy boss and Bulwark shots. Orbs cannot stop them.','A pulse or a dash still works.'],['t2','Red diamond','#ff1744',4,'Absolute bullet. Nothing can erase or reverse it.','Dash through it or weave around it.'],['l','Laser beam','#ffffff',0,'A telegraphed beam that hits a whole column or row.','Leave the line, or dash as it fires.'],['br','Hyperdrive bar','#ffe14a',4,'A solid barrier sweeping down. Only appears if you own Hyperdrive.','Hyperdrive dash over it.']]}
-function menuDraw(){if(!['title','prac','codex','lore','set','wmfail','adv'].includes(S))return;dim(S=='title'?.5:.85);
- if(S=='title'){T('SHAPE LARPER',W/2,140,76,'#5ef2ff');T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,200,19,'#ff7a90','center','normal');T('Every shot is yours to aim. Reach his throne.',W/2,228,17,'#d8d4ff','center','normal');
-  [['Start run',go],['Mode: '+(CFG.wm?'Windows':'Classic'),()=>{CFG.wm^=1;saveD()}],['Practice',()=>S='prac'],['Codex',()=>S='codex'],['Advancements',()=>S='adv'],['Lore',()=>S='lore'],['Settings',()=>S='set']].forEach((q,i)=>btn(q[0],350,248+i*44,260,38,q[1],{sz:19,c:i==1&&CFG.wm?'#ffe14a':undefined}));
-  if(hi)T('Best '+hi+(SEEN.win?'  ·  Throne reached ×'+SEEN.win:''),W/2,566,17,'#9a96c8','center','normal');if(CFG.wm)T(window.SL?'Windows mode: every enemy gets its own window on your desktop.':'Windows mode: every enemy gets its own pop-up window. Desktop Chrome or Edge, pop-ups allowed.',W/2,590,13,'#ffb84f','center','normal');T('WASD move  ·  Mouse aim  ·  Hold click fire  ·  Space dash  ·  Q or right-click pulse  ·  F fullscreen',W/2,614,14,'#9a96c8','center','normal');return}
+function menuDraw(){if(!['title','prac','codex','lore','set','wmfail','adv'].includes(S))return;if(S=='title'){titleMenu();T('v'+VER,W-12,H-12,12,'#8a84b8','right','normal');return}menuBG();dim(.72);
  if(S=='prac'){T('Practice',W/2,64,44);const ok=('b'+PB) in SEEN;T('Fight any guardian you have already met.',W/2,104,16,'#9a96c8','center','normal');
   for(let i=0;i<=NB;i++){const s=('b'+i) in SEEN;btn(s?BNAME(i):'? ? ?',60+(i%2)*250,150+(i/2|0)*54,240,46,()=>{if(s)PB=i},{sel:PB==i,c:s?BCOL(i):'#5a5680'})}
   T('Loadout',730,160,20,'#fff');['Bare','Mid · 4 upgrades','Stacked · 9 upgrades'].forEach((l,j)=>btn(l,580,180+j*52,300,44,()=>PL=j,{sel:PL==j}));
@@ -125,14 +122,14 @@ const BS=[['THE WARDEN','#ff4fa3',90,38],['HIVE MOTHER','#ffb84f',150,44],['THE 
 const SN=['SECTOR 1 · OUTSKIRTS','SECTOR 2 · THE HIVE','SECTOR 3 · THE CORE','SECTOR 4 · ORBITAL RING','SECTOR 5 · STORM FRONT','SECTOR 6 · OMEGA','SECTOR 7 · EVENT HORIZON'];
 const BNAME=i=>i<NB?BS[i][0]:FB[0],BCOL=i=>i<NB?BS[i][1]:FB[1],NB=BS.length,EP=['First guardian of the Gauntlet','Keeper of the swarm','Heart of the Gauntlet','Guardian of the ring','Voice of the storm','Warden of the sixth seal','Devourer of light'];
 
-function m(e){const r=cv.getBoundingClientRect();MU.x=(e.clientX-r.left)*W/r.width;MU.y=(e.clientY-r.top)*H/r.height;CL=0;if(!WM){M.x=MU.x;M.y=MU.y}}
+function m(e){MMOV=1;const r=cv.getBoundingClientRect();MU.x=(e.clientX-r.left)*W/r.width;MU.y=(e.clientY-r.top)*H/r.height;CL=0;if(!WM){M.x=MU.x;M.y=MU.y}}
 addEventListener('mousemove',m);
 function md(e){try{actx()}catch(_){}if(e.button==2){M.r=1;if(S=='pick')banish();return}M.d=1;click()}
 cv.addEventListener('mousedown',e=>{m(e);md(e)});
 function mup(e){if(e.button==2)M.r=0;else M.d=0}addEventListener('mouseup',mup);
 cv.oncontextmenu=e=>e.preventDefault();
 function lostFocus(){M.d=0;M.r=0;for(const k in K)K[k]=0;if(S=='play')S='pause'}addEventListener('blur',()=>WM?wmBlur():lostFocus());
-function kd(e){try{actx()}catch(_){}K[e.code]=1;if(e.code=='Space'||e.code.startsWith('Arrow'))e.preventDefault();
+function kd(e){try{actx()}catch(_){}K[e.code]=1;if(menuKey(e)){e.preventDefault();return}if(e.code=='Space'||e.code.startsWith('Arrow'))e.preventDefault();
  if(e.code=='KeyP'||e.code=='Escape')S=S=='play'?'pause':S=='pause'?'play':S;
  if((e.code=='Enter'||e.code=='Space')&&S!='play'&&S!='pick'&&S!='pause'){if(S=='title')go();else if((S=='over'||S=='win')&&lk<=0)retry()}
  if(e.code=='KeyM'&&S=='pause')toMenu();
@@ -293,11 +290,8 @@ function dim(a){g.fillStyle=`rgba(6,5,16,${a})`;g.fillRect(0,0,W,H)}
 const vis=(x,y,r)=>!VW||(x+r>VW.x0&&x-r<VW.x1&&y+r>VW.y0&&y-r<VW.y1);
 function drawWorld(){
  g.fillStyle='#0a0818';if(VW)g.fillRect(VW.x0,VW.y0,VW.x1-VW.x0,VW.y1-VW.y0);else g.fillRect(-30,-30,W+60,H+60);
- stars();const hu=THR?345:[190,320,40,120,270,10,50][stage%NB];
- g.strokeStyle=`hsla(${hu},90%,60%,.09)`;g.lineWidth=1;g.beginPath();const o=(t*18)%48;
- if(VW){const x0=Math.floor((VW.x0+GOX)/48)*48-GOX,y0=Math.floor((VW.y0+GOY-o)/48)*48-GOY+o;for(let x=x0;x<=VW.x1;x+=48){g.moveTo(x,VW.y0);g.lineTo(x,VW.y1)}for(let y=y0;y<=VW.y1;y+=48){g.moveTo(VW.x0,y);g.lineTo(VW.x1,y)}g.stroke()}
- else{for(let x=0;x<=W;x+=48){g.moveTo(x,0);g.lineTo(x,H)}for(let y=o;y<=H;y+=48){g.moveTo(0,y);g.lineTo(W,y)}g.stroke();
- g.strokeStyle=`hsla(${hu},90%,60%,.4)`;g.lineWidth=3;g.strokeRect(2,2,W-4,H-4)}
+ const hu=THR?345:[190,320,40,120,270,10,50][stage%NB];nebula(hu);bgShapes(hu);stars();
+ gridDraw(hu);
  if(P){
   for(const e of E){if(!vis(e.x,e.y,e.r*4))continue;if(e.w>0){g.strokeStyle=e.c;g.globalAlpha=.5;g.lineWidth=2;g.beginPath();g.arc(e.x,e.y,e.r*(1+e.w*2.5),0,7);g.stroke();g.globalAlpha=1;continue}
    g.shadowColor=e.c;g.shadowBlur=14;g.strokeStyle=e.c;g.lineWidth=2.5;poly(e.x,e.y,e.r,[3,4,6,5,8,7,10,3,4,9][e.k],ang(e,P)+(e.k==1?PI/4:e.k==8?t*3:0));
@@ -423,7 +417,7 @@ function shaper(){const s=AC.createWaveShaper();s.curve=MX.cu;return s}
 const sweep=(p,a,b,t,d)=>{p.setValueAtTime(a,t);p.exponentialRampToValueAtTime(Math.max(1,b),t+d)};
 
 /* drums */
-function kick(t,v=1){const x=osc('sine',165,t,t+.45);x.frequency.exponentialRampToValueAtTime(50,t+.085);x.frequency.exponentialRampToValueAtTime(38,t+.4);
+function kick(t,v=1){KQ.push(t);if(KQ.length>16)KQ.shift();const x=osc('sine',165,t,t+.45);x.frequency.exponentialRampToValueAtTime(50,t+.085);x.frequency.exponentialRampToValueAtTime(38,t+.4);
  chain(x,shaper(),vca(t,.002,v*.85,.36),MX.drum);chain(nzs(t,t+.02),flt('highpass',2800),vca(t,.0005,v*.3,.012),MX.drum);
  const g=MX.duck.gain;g.cancelScheduledValues(t);g.setValueAtTime(.28,t);g.linearRampToValueAtTime(1,t+.2)}
 function snare(t,v=1){chain(nzs(t,t+.3),flt('bandpass',1900,.8),flt('highpass',700),vca(t,.001,v*.5,.19),MX.drum);
@@ -585,7 +579,7 @@ function wmBounds(){if(!WM||!P){BX0=0;BX1=W;BY0=0;BY1=H;QX0=QY0=-30;QX1=W+30;QY1
  BX0=P.x+(s.x-CX)/WSC;BX1=P.x+(s.x+s.w-CX)/WSC;BY0=P.y+(s.y-CY)/WSC;BY1=P.y+(s.y+s.h-CY)/WSC;QX0=Math.min(-30,BX0-40);QX1=Math.max(W+30,BX1+40);QY0=Math.min(-30,BY0-40);QY1=Math.max(H+30,BY1+40)}
 
 /* v0.3: version, advancements, new enemies, living windows */
-const VER='0.3.2';
+const VER='0.3.3';
 
 /* advancements: unlocked once, saved between runs, announced with a toast */
 const ADV=[
@@ -657,6 +651,74 @@ function bossBar(r,iw,ih){const b=boss;g.fillStyle='#0a0818';g.fillRect(0,0,iw,i
  g.fillStyle=b.hit>0?'#fff':b.c;g.fillRect(x,y,w*f,h);g.fillStyle='#0a0818';g.fillRect(x+w*.33,y,2,h);g.fillRect(x+w*.66,y,2,h);
  if(b.sh>0){g.strokeStyle='#fff';g.globalAlpha=.5+.5*Math.sin(t*20);g.strokeRect(x-2,y-2,w+4,h+4);g.globalAlpha=1}}
 function wmTitle(es){const m={};for(const e of es)m[ENAME[e.k]]=(m[ENAME[e.k]]||0)+1;return Object.entries(m).map(([n,c])=>c>1?n+' ×'+c:n).join(' + ')}
+
+/* visuals: beat pulse, synthwave menu, living arena background */
+const KQ=[];
+// 0..1, peaks on every kick drum the music plays
+function beat(){if(!AC||!KQ.length)return 0;const n=AC.currentTime;let k=-1;for(const q of KQ)if(q<=n&&q>k)k=q;return k<0?0:Math.exp(-(n-k)*7)}
+const EC=['#ff4fa3','#ffb84f','#b06cff','#5effa0','#ff7a45','#ffd24a','#3ee0ff','#ff5df0','#a0ffef','#ff9de2'],ES=[3,4,6,5,8,7,10,3,4,9];
+const FLO=[...Array(11)].map((_,i)=>({x:Math.random()*W,y:40+Math.random()*290,z:.45+Math.random()*.8,k:i%10,a:Math.random()*7,s:(Math.random()-.5)*.7,vx:(Math.random()<.5?-1:1)*(6+Math.random()*12)}));
+let MSEL=0,MSELP=-1,MITEMS=[],MMOV=0;const MA=[0,0,0,0,0,0,0];
+function menuBG(){const bt=beat(),hz=372,sx=640,sy=hz-6;
+ let gr=g.createLinearGradient(0,0,0,hz);gr.addColorStop(0,'#04020c');gr.addColorStop(.55,'#12052a');gr.addColorStop(1,'#3d0b4a');g.fillStyle=gr;g.fillRect(0,0,W,hz);
+ g.fillStyle='#fff';for(let i=0;i<80;i++){const a=Math.sin(i*91.7)*43758.5,f=a-Math.floor(a),b=Math.sin(i*37.3)*9871.3,f2=b-Math.floor(b);g.globalAlpha=.2+.55*Math.abs(Math.sin(t*(.5+f)+i));g.fillRect(f*W,f2*hz*.8,f>.9?2.2:1.3,f>.9?2.2:1.3)}g.globalAlpha=1;
+ // sun: glow, gradient disc, scrolling stripes
+ const sr=148+bt*5;gr=g.createRadialGradient(sx,sy,sr*.6,sx,sy,sr*2.1);gr.addColorStop(0,'rgba(255,70,150,.35)');gr.addColorStop(1,'rgba(255,70,150,0)');g.fillStyle=gr;g.fillRect(sx-sr*2.1,sy-sr*2.1,sr*4.2,sr*2.1);
+ g.save();g.beginPath();g.arc(sx,sy,sr,PI,0);g.closePath();g.clip();gr=g.createLinearGradient(0,sy-sr,0,sy);gr.addColorStop(0,'#ffe86a');gr.addColorStop(.5,'#ff6a8a');gr.addColorStop(1,'#c0209a');g.fillStyle=gr;g.fillRect(sx-sr,sy-sr,sr*2,sr);
+ g.fillStyle='#2a0838';const ph=(t*10)%14;for(let i=0;i<8;i++){const yy=sy-sr*.62+i*15+ph*(i/8);g.fillRect(sx-sr,yy,sr*2,1.5+i*1.25)}g.restore();
+ // floating wireframe enemies
+ for(const q of FLO){q.x+=q.vx*q.z*dt;q.a+=q.s*dt;if(q.x<-60)q.x=W+60;if(q.x>W+60)q.x=-60;const r=(14+q.z*16)*(1+bt*.08);
+  g.globalAlpha=.25+q.z*.3;g.strokeStyle=EC[q.k];g.lineWidth=1.5+q.z;g.shadowColor=EC[q.k];g.shadowBlur=10;poly(q.x,q.y+Math.sin(t+q.a)*6,r,ES[q.k],q.a);g.stroke()}g.shadowBlur=0;g.globalAlpha=1;
+ // perspective floor rushing toward you
+ gr=g.createLinearGradient(0,hz,0,H);gr.addColorStop(0,'#1d0634');gr.addColorStop(1,'#040209');g.fillStyle=gr;g.fillRect(0,hz,W,H-hz);
+ g.strokeStyle=`rgba(255,80,170,${.5+bt*.4})`;g.lineWidth=1.4;g.shadowColor='#ff4fa3';g.shadowBlur=8;g.beginPath();
+ for(let i=-16;i<=16;i++){g.moveTo(sx+i*16,hz);g.lineTo(sx+i*150,H+20)}const sp=(t*.55)%1;for(let j=0;j<13;j++){const z=(j+sp)/13,y=hz+(H-hz)*z*z;g.moveTo(0,y);g.lineTo(W,y)}g.stroke();g.shadowBlur=0;
+ g.fillStyle=`rgba(255,110,190,${.7+bt*.3})`;g.fillRect(0,hz-1,W,2);
+ // scanlines and vignette
+ g.fillStyle='rgba(0,0,0,.13)';for(let y=0;y<H;y+=3)g.fillRect(0,y,W,1);
+ gr=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.75);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.55)');g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function titleDraw(){const bt=beat(),y=104+Math.sin(t*1.3)*3,sc=1+bt*.025,gl=(t%5)<.09;g.save();g.translate(W/2+(gl?(Math.random()-.5)*10:0),y);g.scale(sc,sc);
+ g.font=`italic 900 84px ${F}`;g.textAlign='center';g.textBaseline='middle';
+ g.globalCompositeOperation='lighter';g.globalAlpha=.85;g.fillStyle='#ff2d7a';g.fillText('SHAPE LARPER',-3-bt*3,1);g.fillStyle='#2de1ff';g.fillText('SHAPE LARPER',3+bt*3,-1);g.globalAlpha=1;g.globalCompositeOperation='source-over';
+ g.shadowColor='#ff4fa3';g.shadowBlur=26;const gr=g.createLinearGradient(0,-38,0,38);gr.addColorStop(0,'#ffffff');gr.addColorStop(.48,'#bdf6ff');gr.addColorStop(.52,'#ff6ab8');gr.addColorStop(1,'#ffd24a');g.fillStyle=gr;g.fillText('SHAPE LARPER',0,0);g.shadowBlur=0;
+ g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1;g.strokeText('SHAPE LARPER',0,0);g.restore();
+ T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,166,16,'#ff9ac0','center','normal')}
+// slanted neon menu entry; mouse hover and arrow keys share one selection
+function mbtn(i,l,ic,y,f){const x=58,w=300,h=34,hv=MU.x>x&&MU.x<x+w+20&&MU.y>y&&MU.y<y+h;if(hv&&MMOV)MSEL=i;const sel=MSEL==i;MA[i]+=((sel?1:0)-MA[i])*Math.min(1,dt*14);const a=MA[i],ox=x+a*14;
+ BT.push({x,y,w:w+20,h,f,v:CW});g.save();g.beginPath();g.moveTo(ox+10,y);g.lineTo(ox+w+10,y);g.lineTo(ox+w,y+h);g.lineTo(ox,y+h);g.closePath();
+ const gr=g.createLinearGradient(ox,0,ox+w,0);gr.addColorStop(0,`rgba(255,45,122,${.12+a*.38})`);gr.addColorStop(1,`rgba(45,225,255,${.03+a*.12})`);g.fillStyle=a>.05?gr:'rgba(10,6,26,.55)';g.fill();
+ g.strokeStyle=a>.05?`rgba(255,110,190,${.4+a*.6})`:'rgba(140,120,220,.3)';g.lineWidth=1.5;if(a>.05){g.shadowColor='#ff4fa3';g.shadowBlur=14*a}g.stroke();g.shadowBlur=0;
+ g.fillStyle=a>.05?'#5ef2ff':'rgba(140,120,220,.5)';g.fillRect(ox+3,y+5,3,h-10);g.restore();
+ T(ic,ox+26,y+h/2+1,16,a>.05?'#fff':'#9a90d0');T(l,ox+46,y+h/2+1,18,a>.5?'#ffffff':'#d2cbff','left',a>.5?'bold':'normal');if(a>.5)T('›',ox+w-14,y+h/2,22,'#5ef2ff')}
+function titleMenu(){menuBG();titleDraw();
+ MITEMS=[['Start run','▶',go],['Mode: '+(CFG.wm?'Windows':'Classic'),'◆',()=>{CFG.wm^=1;saveD()}],['Practice','⚔',()=>S='prac'],['Codex','✦',()=>S='codex'],['Advancements','★',()=>S='adv'],['Lore','✎',()=>S='lore'],['Settings','⚙',()=>S='set']];
+ MITEMS.forEach((q,i)=>mbtn(i,q[0],q[1],212+i*44,q[2]));
+ MMOV=0;if(MSEL!==MSELP){if(MSELP>=0&&AC)sfx('ui');MSELP=MSEL}
+ const na=ADV.filter(a=>ADVS[a[0]]).length;g.fillStyle='rgba(8,4,20,.6)';g.fillRect(58,532,320,44);g.strokeStyle='rgba(140,120,220,.35)';g.lineWidth=1;g.strokeRect(58,532,320,44);
+ T('BEST',74,546,10,'#9a90d0','left');T(String(hi),74,563,16,'#fff','left');T('THRONE',170,546,10,'#9a90d0','left');T('×'+(SEEN.win||0),170,563,16,'#ffd24a','left');T('ADVANCEMENTS',260,546,10,'#9a90d0','left');T(na+' / '+ADV.length,260,563,16,'#5ef2ff','left');
+ if(CFG.wm)T(window.SL?'Windows mode: every enemy gets its own window on your desktop.':'Windows mode: pop-ups must be allowed. Desktop Chrome or Edge.',58,594,12,'#ffb84f','left','normal');
+ T('WASD move · Mouse aim · Hold click fire · Space dash · Q pulse · ↑↓ + Enter menu',58,616,12,'#8a84b8','left','normal')}
+function menuKey(e){if(S!='title')return 0;const n=MITEMS.length||7;
+ if(e.code=='ArrowUp'||e.code=='KeyW'){MSEL=(MSEL+n-1)%n;return 1}if(e.code=='ArrowDown'||e.code=='KeyS'){MSEL=(MSEL+1)%n;return 1}
+ if(e.code=='Enter'||e.code=='Space'){sfx('ui');(MITEMS[MSEL]||[0,0,go])[2]();return 1}return 0}
+// sturdier look for every other button
+function btnBox(x,y,w,h,hv,sel){g.save();g.beginPath();if(g.roundRect)g.roundRect(x,y,w,h,7);else g.rect(x,y,w,h);
+ const gr=g.createLinearGradient(0,y,0,y+h);gr.addColorStop(0,hv?'rgba(60,34,110,.95)':'rgba(24,16,54,.9)');gr.addColorStop(1,hv?'rgba(34,20,72,.95)':'rgba(12,8,30,.9)');g.fillStyle=gr;g.fill();
+ g.lineWidth=hv||sel?2:1.3;g.strokeStyle=sel?'#ffe14a':hv?'#5ef2ff':'rgba(140,120,220,.45)';if(hv||sel){g.shadowColor=g.strokeStyle;g.shadowBlur=12}g.stroke();g.restore()}
+
+/* arena background: drifting nebulae, slow giant outlines, a two-level grid that breathes with the music */
+const hsh=(a,b)=>{const h=Math.sin(a*12.9898+b*78.233)*43758.5453;return h-Math.floor(h)};
+function nebula(hu){const x0=VW?VW.x0:0,x1=VW?VW.x1:W,y0=VW?VW.y0:0,y1=VW?VW.y1:H,c=480;
+ for(let i=Math.floor((x0+GOX-480)/c);i<=Math.floor((x1+GOX+480)/c);i++)for(let j=Math.floor((y0+GOY-480)/c);j<=Math.floor((y1+GOY+480)/c);j++){
+  const f=hsh(i,j),f2=hsh(j+7,i-3),x=i*c+f*c-GOX,y=j*c+f2*c-GOY,r=(220+f2*200)*(1+Math.sin(t*.3+f*9)*.08),hh=hu+(f-.5)*90;
+  const gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,`hsla(${hh},85%,55%,.2)`);gr.addColorStop(.6,`hsla(${hh},85%,45%,.07)`);gr.addColorStop(1,`hsla(${hh},85%,45%,0)`);g.fillStyle=gr;g.fillRect(x-r,y-r,r*2,r*2)}}
+function bgShapes(hu){const x0=VW?VW.x0:0,x1=VW?VW.x1:W,y0=VW?VW.y0:0,y1=VW?VW.y1:H,c=520;g.lineWidth=2;
+ for(let i=Math.floor((x0+GOX-200)/c);i<=Math.floor((x1+GOX+200)/c);i++)for(let j=Math.floor((y0+GOY-200)/c);j<=Math.floor((y1+GOY+200)/c);j++){
+  const f=hsh(i+11,j+5);if(f>.55)continue;const f2=hsh(j-2,i+9),x=i*c+f2*c-GOX,y=j*c+f*c/.55-GOY;g.strokeStyle=`hsla(${hu+(f2-.5)*60},80%,65%,.11)`;poly(x,y,70+f2*110,3+(f*10|0)%6,t*.08*(f2-.5)+f*6);g.stroke()}}
+function gridDraw(hu){const x0=VW?VW.x0:0,x1=VW?VW.x1:W,y0=VW?VW.y0:0,y1=VW?VW.y1:H,bt=beat();
+ for(const [st,al,lw] of [[48,.07+bt*.05,1],[192,.15+bt*.14,1.6]]){const o=(t*18)%st;g.strokeStyle=`hsla(${hu},90%,62%,${al})`;g.lineWidth=lw;g.beginPath();
+  for(let x=Math.floor((x0+GOX)/st)*st-GOX;x<=x1;x+=st){g.moveTo(x,y0);g.lineTo(x,y1)}for(let y=Math.floor((y0+GOY-o)/st)*st-GOY+o;y<=y1;y+=st){g.moveTo(x0,y);g.lineTo(x1,y)}g.stroke()}
+ if(!VW){g.strokeStyle=`hsla(${hu},90%,62%,${.45+bt*.35})`;g.lineWidth=3;g.shadowColor=`hsl(${hu},90%,60%)`;g.shadowBlur=10+bt*16;g.strokeRect(2,2,W-4,H-4);g.shadowBlur=0}}
 
 /* windows mode: the player, every enemy and every boss live in their own real browser window.
    One simulation runs here; each pop-up is a same-origin about:blank page we draw into directly. */
