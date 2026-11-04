@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Neon Gauntlet</title>
+<title>Shape Larper</title>
 <style>
 :root{color-scheme:dark;--bg:#07060f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{height:100%;margin:0;background:var(--bg);overflow:hidden}
@@ -17,9 +17,9 @@ addEventListener('resize',fit);fit();
 const ang=(a,b)=>Math.atan2(b.y-a.y,b.x-a.x),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 let AC;function snd(f,d=.08,ty='square',v=.04,sl=0){try{if(!CFG.vol)return;AC=AC||new AudioContext();if(AC.state=='suspended')AC.resume();const n=AC.currentTime,o=AC.createOscillator(),a=AC.createGain();o.type=ty;o.frequency.setValueAtTime(f,n);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+sl),n+d);a.gain.setValueAtTime(v*CFG.vol,n);a.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(a);a.connect(AC.destination);o.start();o.stop(n+d)}catch(e){}}
 const K={},M={x:W/2,y:H/2,d:0,r:0};
-let S='title',P=null,E=[],B=[],PT=[],FT=[],RG=[],LZ=[],BR=[],PV=[],TIP=null,BT=[],SEEN={},CFG={vol:1,shk:1,fl:1,aim:1},prac=0,PL=1,PB=0,sub=0,cf=0,BAN=new Set(),KC=0,own={},boss=null,stage=0,wave=0,shake=0,t=0,dt=0,last=0,hi=0,score=0,combo=0,comboT=0,cards=[],spawnQ=[],wt=0,adv=0,flash=0,lk=0,ban=null;
+let S='title',P=null,E=[],B=[],PT=[],FT=[],RG=[],LZ=[],BR=[],PV=[],TIP=null,BT=[],SEEN={},CFG={vol:1,shk:1,fl:1,aim:1},prac=0,NP=0,PL=1,PB=0,sub=0,cf=0,BAN=new Set(),KC=0,own={},boss=null,stage=0,wave=0,shake=0,t=0,dt=0,last=0,hi=0,score=0,combo=0,comboT=0,cards=[],spawnQ=[],wt=0,adv=0,flash=0,lk=0,ban=null;
 try{hi=+localStorage.getItem('ng_hi')||0}catch(e){}
-const U0=()=>({dmg:1,rate:1,multi:1,pierce:0,dashCd:1,speed:1,pulse:1,bounce:0,home:0,orbs:0,shock:0,chain:0,crit:0,size:0,refl:0,graze:0,rev:0,rear:0,med:0,vamp:0,bspd:1,aura:0,adr:0,hyper:0}),U=U0(),dps=()=>U.dmg*U.rate*(1+(U.multi-1)*.6)*(1+U.crit*1.5)*(1+U.pierce*.08);
+const U0=()=>({dmg:1,rate:1,multi:1,pierce:0,dashCd:1,speed:1,pulse:1,bounce:0,home:0,orbs:0,shock:0,chain:0,crit:0,size:0,refl:0,graze:0,rev:0,rear:0,med:0,vamp:0,bspd:1,aura:0,adr:0,hyper:0}),U=U0(),ED=()=>Math.pow(1.087,NP),PW=()=>{const r=dps()/ED();return ED()*Math.pow(r,r<1?.5:.25)},dps=()=>U.dmg*U.rate*(1+(U.multi-1)*.6)*(1+U.crit*1.5)*(1+U.pierce*.08);
 const UP=[
 ['Overcharge','+30% shot damage',()=>U.dmg*=1.3,'💥'],
 ['Hair Trigger','+20% fire rate (capped)',()=>U.rate=Math.max(U.rate,Math.min(2.2,U.rate*1.2)),'⚡'],
@@ -51,7 +51,7 @@ try{Object.assign(SEEN,JSON.parse(localStorage.getItem('ng_seen')||'{}'));Object
 function saveD(){try{localStorage.setItem('ng_seen',JSON.stringify(SEEN));localStorage.setItem('ng_cfg',JSON.stringify(CFG))}catch(e){}}
 function see(id){if(!(id in SEEN)){SEEN[id]=0;saveD()}}
 function go(){prac=0;newGame()}
-function startPrac(i){PB=i;newGame();prac=1;stage=i;wave=2;spawnQ=[];for(let k=0;k<[0,4,9][PL];k++)UP[R()*UP.length|0][2]();P.hp=P.mhp;ban=null;begin()}
+function startPrac(i){PB=i;newGame();prac=1;stage=i;wave=2;spawnQ=[];NP=[0,4,9][PL];for(let k=0;k<NP;k++)UP[R()*UP.length|0][2]();P.hp=P.mhp;ban=null;begin()}
 function retry(){prac?startPrac(PB):go()}
 function toMenu(){S='title';P=null;boss=null;E=[];B=[];LZ=[];BR=[];PT=[];FT=[];RG=[];ban=null;prac=0;spawnQ=[];adv=0}
 function btn(l,x,y,w,h,f,o={}){const hv=M.x>x&&M.x<x+w&&M.y>y&&M.y<y+h;BT.push({x,y,w,h,f});g.fillStyle=hv?'#221c4d':'#130f2d';g.strokeStyle=o.sel?'#ffe14a':hv?'#5ef2ff':'#3a3566';g.lineWidth=2;g.fillRect(x,y,w,h);g.strokeRect(x,y,w,h);T(l,x+w/2,y+h/2,o.sz||18,o.c||(hv?'#fff':'#d8d4ff'))}
@@ -59,7 +59,7 @@ function wr(s,x,y,w,lh,c,sz){g.font=`${sz}px ${F}`;let ln='',yy=y;for(const wd o
 const BD=[['First guardian of the Gauntlet. Fires rings and aimed fans, then a spiral when hurt.','The gold-ringed center shot ignores orbs. Dodge it.'],['Keeper of the swarm. Summons chasers, rains bullets and charges along a red line.','Leave the red line before it fires.'],['Heart of the Gauntlet. Spirals, rings and walls of red diamonds with a single gap.','Walls cannot be erased. Find the gap.'],['Guardian of the ring. Armored while it drops mines from above, exposed when it lands.','Save your damage for the landing.'],['Voice of the storm. Teleports and calls down telegraphed lasers.','Dash through a beam as it fires.'],['Warden of the sixth seal. Spirals, walls, lasers and fans, all at once.','Watch for the wall and keep a dash ready.'],['Devourer of light. Drags you in, then detonates in rings.','Dash out when the gold ring collapses.']];
 function ENTS(){return[['e0','Chaser','#ff4fa3',3,'Rushes straight at you. Fragile, but they come in swarms.','Keep moving and thin them out.'],['e1','Shooter','#ffb84f',4,'Keeps its distance and fires aimed shots, in threes from sector 2.','Strafe sideways and kill them early.'],['e2','Bomber','#b06cff',6,'Slow and sturdy. Bursts into a ring of bullets when it dies.','Kill it at range, or dash through the ring.'],['e3','Charger','#5effa0',5,'Flashes, then lunges across the arena at high speed.','Sidestep the flash, then punish it.'],['e4','Spinner','#ff7a45',8,'A stationary turret firing rotating streams of bullets.','Find the gaps and kill it from the side.'],['e5','Bulwark','#ffd24a',7,'Slow and tanky. Fires big gold-ringed bullets that ignore orbs.','A pulse or a dodge. Orbs will not help.'],['e6','Splitter','#3ee0ff',10,'Splits into three chasers when killed.','Kill it away from you.'],...BS.map((b,i)=>['b'+i,b[0],b[1],[6,8,5,7,3,10,9][i]||6,...(BD[i]||['Unknown guardian.',''])]),['t1','Gold-ringed bullet','#ffe08a',0,'Heavy boss and Bulwark shots. Orbs cannot stop them.','A pulse or a dash still works.'],['t2','Red diamond','#ff1744',4,'Absolute bullet. Nothing can erase or reverse it.','Dash through it or weave around it.'],['l','Laser beam','#ffffff',0,'A telegraphed beam that hits a whole column or row.','Leave the line, or dash as it fires.'],['br','Hyperdrive bar','#ffe14a',4,'A solid barrier sweeping down. Only appears if you own Hyperdrive.','Hyperdrive dash over it.']]}
 function menuDraw(){if(!['title','prac','codex','lore','set'].includes(S))return;dim(S=='title'?.5:.85);
- if(S=='title'){T('NEON GAUNTLET',W/2,140,76,'#5ef2ff');T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,200,19,'#ff7a90','center','normal');T('Every shot is yours to aim. Reach his throne.',W/2,228,17,'#d8d4ff','center','normal');
+ if(S=='title'){T('SHAPE LARPER',W/2,140,76,'#5ef2ff');T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,200,19,'#ff7a90','center','normal');T('Every shot is yours to aim. Reach his throne.',W/2,228,17,'#d8d4ff','center','normal');
   [['Start run',go],['Practice',()=>S='prac'],['Codex',()=>S='codex'],['Lore',()=>S='lore'],['Settings',()=>S='set']].forEach((q,i)=>btn(q[0],350,270+i*56,260,46,q[1],{sz:22}));
   if(hi)T('Best '+hi,W/2,572,17,'#9a96c8','center','normal');T('WASD move  ·  Mouse aim  ·  Hold click fire  ·  Space dash  ·  Q or right-click pulse  ·  F fullscreen',W/2,606,14,'#9a96c8','center','normal');return}
  if(S=='prac'){T('Practice',W/2,64,44);const ok=('b'+PB) in SEEN;T('Fight any guardian you have already met.',W/2,104,16,'#9a96c8','center','normal');
@@ -137,7 +137,7 @@ function click(){if(S=='play')return;if(S!='pick'){for(const b of BT)if(M.x>b.x&
 
 function newGame(){Object.assign(U,U0());
  P={x:W/2,y:H*.75,hp:5,mhp:5,cd:0,dash:0,dt:0,dx:0,dy:0,inv:1,pc:0,r:11,bn:3};
- E=[];B=[];PT=[];FT=[];RG=[];LZ=[];BR=[];KC=0;own={};BAN=new Set();boss=null;stage=0;wave=0;score=0;combo=0;adv=0;S='play';startWave()}
+ E=[];B=[];PT=[];FT=[];RG=[];LZ=[];BR=[];KC=0;NP=0;own={};BAN=new Set();boss=null;stage=0;wave=0;score=0;combo=0;adv=0;S='play';startWave()}
 function banner(a,b){ban={a,b,t:2.4}}
 function pick(r){const s=stage%NB+(stage/NB|0)*2,o=[0,1];if(s>0)o.push(2,6);if(s>1)o.push(3,5);if(s>2)o.push(4);return r<.3?0:o[(R()*o.length)|0]}
 function orbs(){const r=[];for(let i=0;i<U.orbs;i++){const a=t*3+i*2*PI/U.orbs;r.push([P.x+Math.cos(a)*48,P.y+Math.sin(a)*48])}return r}
@@ -147,16 +147,16 @@ function bigAtk(b){for(let k=0;k<2;k++)for(let i=0;i<24;i++)eb(b.x,b.y,i*PI/12+k
 function startWave(){spawnQ=[];wt=0;const n=Math.min(32,7+stage*3+wave*3);
  for(let i=0;i<n;i++){const r=R();spawnQ.push({at:i*.45,k:pick(r)})}
  banner(SN[stage%NB]+(stage>=NB?' +'+(stage/NB|0):''),'WAVE '+(wave+1))}
-function startBoss(){const D=BS[stage%NB],hp=Math.round(D[2]*(1+(stage/NB|0)*.5)*(1+(dps()-1)*.6));boss={n:stage%NB,name:D[0],c:D[1],hp,mhp:hp,r:D[3],x:W/2,y:-90,t:0,intro:1.6,T:{},hit:0,m:'idle',sp:0,sh:0,ph:0,pc:Math.max(.5,1/(1+(dps()-1)*.25))};
+function startBoss(){const D=BS[stage%NB],hp=Math.round(D[2]*(1+(stage/NB|0)*.5)*(1+(PW()-1)*.6));boss={n:stage%NB,name:D[0],c:D[1],hp,mhp:hp,r:D[3],x:W/2,y:-90,t:0,intro:1.6,T:{},hit:0,m:'idle',sp:0,sh:0,ph:0,pc:Math.max(.5,1/(1+(Math.min(ED(),PW())-1)*.25))};
  see('b'+(stage%NB));banner('WARNING · '+EP[stage%NB],D[0]);snd(80,.8,'sawtooth',.1,40)}
 function begin(){P.x=W/2;P.y=H*.78;P.inv=1;B=[];E=[];LZ=[];BR=[];wave==2?startBoss():startWave()}
 function spawn(k,px,py){let x=px,y=py;if(x==null){const s=R()*4|0;x=s<2?R()*W:s==2?24:W-24;y=s==0?24:s==1?H-24:R()*H}
  const D=[{hp:2,r:12,sp:115+stage*10,c:'#ff4fa3'},{hp:3,r:13,sp:75,c:'#ffb84f'},{hp:7,r:19,sp:52,c:'#b06cff'},{hp:4,r:12,sp:0,c:'#5effa0'},{hp:9,r:17,sp:0,c:'#ff7a45'},{hp:11,r:20,sp:0,c:'#ffd24a'},{hp:6,r:16,sp:70,c:'#3ee0ff'}][k];
- see('e'+k);E.push({k,x,y,...D,hp:Math.ceil((D.hp+stage*.8)*(1+(dps()-1)*.3)),a:R()*6,ch:0,w:px==null?.7:.35,cd:1+R()*1.5,hit:0})}
+ see('e'+k);E.push({k,x,y,...D,hp:Math.ceil((D.hp+stage*.8)*(1+(PW()-1)*.3)),a:R()*6,ch:0,w:px==null?.7:.35,cd:1+R()*1.5,hit:0})}
 function advance(){if(prac){S='win';lk=1.2;return}P.hp=Math.min(P.mhp,P.hp+1+U.med);fin();wave++;if(wave==3){wave=0;stage++}
  
  deal();S='pick';lk=.5}
-function choose(i){if(lk>0||!cards[i])return;const c=cards[i];if(c[4]=='hp')P.hp--;if(c[4]=='max'){P.mhp--;P.hp=Math.min(P.hp,P.mhp)}c[2]();own[c[0]]=own[c[0]]||{i:c[3],n:0,nm:c[0],d:c[1],k:[]};own[c[0]].n++;own[c[0]].k=PV[i]?PV[i][1]:[];if(c[4]){shake=16;flash=.35;snd(70,.6,'sawtooth',.1,-20)}snd(520,.25,'sine',.08,500);S='play';begin()}
+function choose(i){if(lk>0||!cards[i])return;const c=cards[i];if(c[4]=='hp')P.hp--;if(c[4]=='max'){P.mhp--;P.hp=Math.min(P.hp,P.mhp)}c[2]();own[c[0]]=own[c[0]]||{i:c[3],n:0,nm:c[0],d:c[1],k:[]};own[c[0]].n++;NP++;own[c[0]].k=PV[i]?PV[i][1]:[];if(c[4]){shake=16;flash=.35;snd(70,.6,'sawtooth',.1,-20)}snd(520,.25,'sine',.08,500);S='play';begin()}
 function fin(){saveD();if(prac)return;hi=Math.max(hi,score);try{localStorage.setItem('ng_hi',hi)}catch(e){}}
 
 function eb(x,y,a,s,r=5,c='#ff5a7a',ty=0){s*=(1+(stage/NB|0)*.12)*U.bspd;if(ty)see('t'+ty);B.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r,c,h:1,ty,l:9})}
@@ -312,7 +312,7 @@ function draw(){
  if(ban){g.globalAlpha=Math.min(1,ban.t*1.2);T(ban.a,W/2,H*.36,ban.a.startsWith('WARNING')?20:20,ban.a.startsWith('WARNING')?'#ff4f6d':'#9a96c8');T(ban.b,W/2,H*.36+48,ban.a.startsWith('WARNING')?60:52,'#fff');g.globalAlpha=1}
  if(flash>0){g.fillStyle=`rgba(255,255,255,${flash*.5*CFG.fl})`;g.fillRect(0,0,W,H)}
  g.restore();
- menuDraw();if(S=='oldtitle'){dim(.5);T('NEON GAUNTLET',W/2,200,76,'#5ef2ff');T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,254,19,'#ff7a90','center','normal');T('His guardians stand between you and his throne. Every shot is yours to aim.',W/2,286,19,'#d8d4ff','center','normal');
+ menuDraw();if(S=='oldtitle'){dim(.5);T('SHAPE LARPER',W/2,200,76,'#5ef2ff');T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,254,19,'#ff7a90','center','normal');T('His guardians stand between you and his throne. Every shot is yours to aim.',W/2,286,19,'#d8d4ff','center','normal');
   T('WASD  move      Mouse  aim      Hold click  fire',W/2,340,18,'#fff','center','normal');
   T('Space  dash (you cannot be hit mid-dash)      Q or right-click  pulse',W/2,372,18,'#fff','center','normal');
   T('Kills charge the pulse. A full pulse wipes bullets and hurts everything nearby.',W/2,404,16,'#9a96c8','center','normal');T('Gold-ringed bullets slip past orbs. Red diamonds can’t be stopped by anything, so dash.',W/2,432,16,'#ffb84f','center','normal');
