@@ -2,8 +2,8 @@ name: Build desktop app
 on:
   workflow_dispatch:
   push:
+    branches: ['main', 'claude/**']
     tags: ['v*']
-    branches: ['claude/**']
     paths: ['index.html', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
 jobs:
   build:
@@ -24,7 +24,42 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build:${{ matrix.target }}
+      - name: Zip (Windows)
+        if: matrix.target == 'win'
+        shell: pwsh
+        run: Compress-Archive -Path "dist/Shape Larper-win32-x64" -DestinationPath ShapeLarper-win-x64.zip
+      - name: Zip (macOS)
+        if: matrix.target == 'mac'
+        run: ditto -c -k --keepParent "dist/Shape Larper-darwin-universal/Shape Larper.app" ShapeLarper-mac-universal.zip
+      - name: Zip (Linux)
+        if: matrix.target == 'linux'
+        run: cd dist && zip -qry ../ShapeLarper-linux-x64.zip "Shape Larper-linux-x64"
       - uses: actions/upload-artifact@v4
         with:
           name: shape-larper-${{ matrix.target }}
-          path: dist/
+          path: ShapeLarper-*.zip
+
+  # every push to main replaces the "latest" release with fresh downloads
+  release:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest out/*.zip --target "$GITHUB_SHA" --title "Shape Larper (latest)" --notes "Windows: unzip ShapeLarper-win-x64.zip and run Shape Larper.exe. If SmartScreen warns, click More info, then Run anyway.
+
+          macOS: unzip and open Shape Larper.app. The app is unsigned: right-click it and choose Open, or run xattr -cr on it.
+
+          Linux: unzip and run the shape-larper binary.
+
+          Built from $GITHUB_SHA."

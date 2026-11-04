@@ -15,7 +15,11 @@ Open `index.html`. Windows mode works in desktop Chrome or Edge once pop-ups are
 
 The desktop app has frameless windows, full-size waves, up to 48 enemy windows, no pop-up prompts, and aiming that works over the desktop between windows.
 
-Windows: download `ShapeLarper-win-x64.zip`, unzip it, and run `Shape Larper.exe`.
+**Download:** [Releases → latest](https://github.com/unknown-566/shape-larper/releases/tag/latest)
+
+- Windows: `ShapeLarper-win-x64.zip`. Unzip it and run `Shape Larper.exe`.
+- macOS: `ShapeLarper-mac-universal.zip` (unsigned: right-click the app and choose Open).
+- Linux: `ShapeLarper-linux-x64.zip`.
 
 Build it yourself (Node 22):
 
@@ -27,6 +31,6 @@ npm run build:mac    # dist/Shape Larper-darwin-universal/
 npm run build:linux  # dist/Shape Larper-linux-x64/
 ```
 
-GitHub Actions (`.github/workflows/build.yml`) builds all three and attaches them to the run as artifacts.
+GitHub Actions (`.github/workflows/build.yml`) builds all three on every push. Pushes to `main` also replace the `latest` release with fresh downloads.
 
 The app is unsigned, so Windows SmartScreen may warn on first launch: click "More info", then "Run anyway".
