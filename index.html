@@ -242,13 +242,13 @@ function bossUpd(){const b=boss,f=b.hp/b.mhp;b.t+=dt;b.hit-=dt;b.sh-=dt;if(b.big
 
 function upd(){
  let mx=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0),my=(K.KeyS||K.ArrowDown?1:0)-(K.KeyW||K.ArrowUp?1:0);
- mx+=JX;my+=JY;const ml=Math.max(1,Math.hypot(mx,my));mx/=ml;my/=ml;P.mvx=mx;P.mvy=my;
+ mx+=JX;my+=JY;if(!isFinite(mx))mx=0;if(!isFinite(my))my=0;const ml=Math.max(1,Math.hypot(mx,my));mx/=ml;my/=ml;P.mvx=mx;P.mvy=my;
  P.inv-=dt;P.cd-=dt;P.mf-=dt;P.ad-=dt;P.ph-=dt;P.ih-=dt;P.dash-=dt;comboT-=dt;if(comboT<=0)combo=0;
  if((K.Space||K.ShiftLeft||K.PadD)&&P.dash<=0){P.dash=1.1*U.dashCd;P.dt=.17+(U.hyper?.06:0);P.ph=U.hyper?P.dt+.1:0;P.inv=Math.max(P.inv,U.hyper?.5:.3);const mv=mx||my;
   P.dx=mv?mx:Math.cos(ang(P,M));P.dy=mv?my:Math.sin(ang(P,M));sfx('dash');if(U.shock){const n=8+U.shock*4;for(let i=0;i<n;i++)pb(P.x,P.y,i*2*PI/n)}}
  if(P.dt>0){P.dt-=dt;P.x+=P.dx*820*dt;P.y+=P.dy*820*dt;PT.push({x:P.x,y:P.y,vx:0,vy:0,l:.3,m:.3,c:U.hyper?'#ffe14a':'#5ef2ff'})}
  else{P.x+=mx*255*U.speed*dt;P.y+=my*255*U.speed*dt;if((mx||my)&&R()<.6)PT.push({x:P.x-mx*9,y:P.y-my*9,vx:-mx*90+(R()-.5)*50,vy:-my*90+(R()-.5)*50,l:.22,m:.22,c:U.hyper?'#ffe14a':'#5ef2ff'})}
- if(WM){wmShift();DIST+=Math.hypot(mx,my)*255*U.speed*dt;if(DIST>6000)ach('roam')}P.x=cl(P.x,P.r,W-P.r);P.y=cl(P.y,P.r,H-P.r);
+ if(!isFinite(P.x)||!isFinite(P.y)){P.x=W/2;P.y=H*.75}if(WM){wmShift();DIST+=Math.hypot(mx,my)*255*U.speed*dt;if(DIST>6000)ach('roam')}P.x=cl(P.x,P.r,W-P.r);P.y=cl(P.y,P.r,H-P.r);
  if(M.d&&P.cd<=0&&P.dt<=0){P.cd=.19/(U.rate*(P.ad>0?1.8:1));const a=ang(P,M),n=U.multi;
   for(let i=0;i<n;i++)pb(P.x+Math.cos(a)*14,P.y+Math.sin(a)*14,a+(i-(n-1)/2)*.13);for(let i=0;i<U.rear;i++)pb(P.x,P.y,a+PI+(i%2?1:-1)*Math.ceil(i/2)*.2);sfx('shot');P.mf=.06;if(WM){RCL.x-=Math.cos(a)*3;RCL.y-=Math.sin(a)*3;const m=Math.hypot(RCL.x,RCL.y);if(m>28){RCL.x*=28/m;RCL.y*=28/m}}}
  if((K.KeyQ||K.KeyE||M.r||K.PadP)&&P.pc>=100)pulse();
@@ -367,9 +367,9 @@ function tend(e){e.preventDefault();for(const c of e.changedTouches){delete TS.b
  if(TS.lp){clearTimeout(TS.lp);TS.lp=0;if(S=='pick')click()}}
 for(const [n,f] of [['touchstart',tstart],['touchmove',tmove],['touchend',tend],['touchcancel',tend]])cv.addEventListener(n,f,{passive:false});
 let GPOK=1;function gpList(){if(!GPOK)return[];try{return[...navigator.getGamepads()]}catch(e){GPOK=0;return[]}}
-function pads(){const p=gpList().find(x=>x&&x.connected),dz=v=>Math.abs(v)<.2?0:v,bt=i=>!!(p&&p.buttons[i]&&p.buttons[i].pressed),T=Object.values(TS.btn);
+function pads(){const p=gpList().find(x=>x&&x.connected),dz=v=>typeof v!='number'||!isFinite(v)||Math.abs(v)<.2?0:v,bt=i=>!!(p&&p.buttons[i]&&p.buttons[i].pressed),T=Object.values(TS.btn);
  JX=TS.m?TS.m.vx:0;JY=TS.m?TS.m.vy:0;let ax=TS.a?TS.a.vx:0,ay=TS.a?TS.a.vy:0;
- if(p){JX+=dz(p.axes[0]);JY+=dz(p.axes[1]);ax+=dz(p.axes[2]||0);ay+=dz(p.axes[3]||0)}
+ if(p&&p.axes){JX+=dz(p.axes[0]);JY+=dz(p.axes[1]);ax+=dz(p.axes[2]);ay+=dz(p.axes[3])}
  const l=Math.hypot(ax,ay),fire=S=='play'&&!!P&&(l>.25||bt(7));
  if(S=='play'&&P&&l>.25){MSRC=0;M.x=cl(P.x+ax/l*220,0,W);M.y=cl(P.y+ay/l*220,0,H)}
  if(fire)M.d=1;else if(GF)M.d=0;GF=fire;
@@ -585,7 +585,7 @@ function wmBounds(){if(!WM||!P){BX0=0;BX1=W;BY0=0;BY1=H;QX0=QY0=-30;QX1=W+30;QY1
  BX0=P.x+(s.x-CX)/WSC;BX1=P.x+(s.x+s.w-CX)/WSC;BY0=P.y+(s.y-CY)/WSC;BY1=P.y+(s.y+s.h-CY)/WSC;QX0=Math.min(-30,BX0-40);QX1=Math.max(W+30,BX1+40);QY0=Math.min(-30,BY0-40);QY1=Math.max(H+30,BY1+40)}
 
 /* v0.3: version, advancements, new enemies, living windows */
-const VER='0.3.1';
+const VER='0.3.2';
 
 /* advancements: unlocked once, saved between runs, announced with a toast */
 const ADV=[
@@ -638,7 +638,7 @@ function stars(){const x0=VW?VW.x0:0,x1=VW?VW.x1:W,y0=VW?VW.y0:0,y1=VW?VW.y1:H,c
 
 /* windows mode: the player window drifts toward where you move and kicks back when you shoot or get hit */
 let LEAD={x:0,y:0},RCL={x:0,y:0};
-function wmPlayer(s){const k=Math.min(1,dt*2.2);LEAD.x+=((P.mvx||0)*120-LEAD.x)*k;LEAD.y+=((P.mvy||0)*90-LEAD.y)*k;
+function wmPlayer(s){const k=Math.min(1,dt*2.2);for(const q of [LEAD,RCL])if(!isFinite(q.x)||!isFinite(q.y)){q.x=0;q.y=0}LEAD.x+=((P.mvx||0)*120-LEAD.x)*k;LEAD.y+=((P.mvy||0)*90-LEAD.y)*k;
  const dm=Math.pow(.8,dt*60);RCL.x*=dm;RCL.y*=dm;const sk=shake*CFG.shk*.5;
  const cx=cl(s.x+s.w/2+LEAD.x+RCL.x+sk*Math.sin(t*57),s.x+PWW/2,s.x+s.w-PWW/2),cy=cl(s.y+s.h/2+LEAD.y+RCL.y+sk*Math.sin(t*67+1),s.y+PWH/2,s.y+s.h-PWH/2);
  const nx=Math.round(cx-PWW/2-wox()),ny=Math.round(cy-PWH/2-woy());
@@ -730,7 +730,7 @@ function wmSync(){if(!P)return;const s=scr(),want=new Map();let ch=0;
   const jg=q.es.some(e=>e.hit>0)?(hb?7:b?3:4):0,nx=Math.round(c.x-z/2-wox()+(jg?(R()-.5)*2*jg:0)),ny=Math.round(c.y-zh/2-woy()+(jg?(R()-.5)*2*jg:0));
   if(nx!==r.lx||ny!==r.ly){if(NAT)MV.push(['sl_'+k,nx,ny]);else try{r.w.moveTo(nx,ny)}catch(_){}r.lx=nx;r.ly=ny}guard(r)}
  if(WE.size>=10)ach('windows10');
- guard(WP);if(NAT){if(MV.length)SL.move(MV);MV=[]}else if(ch)try{WP.w.focus()}catch(_){}}
+ guard(WP);if(NAT){MV=MV.filter(m=>isFinite(m[1])&&isFinite(m[2]));if(MV.length)SL.move(MV);MV=[]}else if(ch)try{WP.w.focus()}catch(_){}}
 function wmRender(){if(!WP||WP.w.closed||!P)return;wmSync();for(const r of [WP,...WE.values()])if(!r.w.closed)try{wmDraw(r)}catch(_){}}
 // draw the slice of the world that sits behind this window on the desktop
 function wmDraw(r){const w=r.w,d=w.devicePixelRatio||1,iw=w.innerWidth||r.iw,ih=w.innerHeight||r.ih,bw=Math.round(iw*d),bh=Math.round(ih*d);

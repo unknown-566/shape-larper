@@ -31,7 +31,9 @@ function createMain(){
     else{w.showInactive();if(player&&!player.isDestroyed())player.moveTop()}});
   main.on('closed',()=>{main=null;app.quit()});
 }
-ipcMain.on('sl:move',(_,list)=>{for(const [n,x,y] of list){const w=kids.get(n);if(w&&!w.isDestroyed())w.setPosition(Math.round(x),Math.round(y))}});
+// never let a bad position from the page crash the app
+ipcMain.on('sl:move',(_,list)=>{if(!Array.isArray(list))return;for(const it of list){if(!Array.isArray(it))continue;const [n,x,y]=it,w=kids.get(n);
+  if(!w||w.isDestroyed()||!Number.isFinite(x)||!Number.isFinite(y))continue;try{w.setPosition(Math.round(x),Math.round(y))}catch(e){}}});
 ipcMain.on('sl:main',(_,show)=>{if(!main)return;if(show){main.show();main.focus()}else main.hide()});
 let lx=null,ly=null;
 setInterval(()=>{if(!main||!kids.size)return;const p=screen.getCursorScreenPoint();if(p.x!==lx||p.y!==ly){lx=p.x;ly=p.y;main.webContents.send('sl:cur',p.x,p.y)}},8);
