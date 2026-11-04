@@ -8,10 +8,11 @@ app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch('disable-background-timer-throttling');
 
 function createMain(){
-  main=new BrowserWindow({width:960,height:640,useContentSize:true,backgroundColor:'#07060f',title:'Shape Larper',autoHideMenuBar:true,
+  main=new BrowserWindow({width:960,height:640,useContentSize:true,backgroundColor:'#07060f',title:'Shape Larper v'+app.getVersion(),autoHideMenuBar:true,
     webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,backgroundThrottling:false}});
   main.setMenu(null);
   main.loadFile(path.join(__dirname,'..','index.html'));
+  main.on('page-title-updated',e=>e.preventDefault());
   const wc=main.webContents;
   wc.setWindowOpenHandler(({frameName})=>{
     const player=frameName=='sl_p';

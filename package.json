@@ -1,7 +1,7 @@
 {
   "name": "shape-larper",
   "productName": "Shape Larper",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Bullet hell arcade where every enemy lives in its own window",
   "main": "electron/main.js",
   "private": true,

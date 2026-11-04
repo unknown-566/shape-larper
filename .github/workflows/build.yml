@@ -2,7 +2,7 @@ name: Build desktop app
 on:
   workflow_dispatch:
   push:
-    branches: ['main', 'claude/**']
+    branches: ['main']
     tags: ['v*']
     paths: ['index.html', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
 jobs:
@@ -47,6 +47,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: out
@@ -55,8 +56,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
+          V=$(node -p "require('./package.json').version")
+          # one release per version, so old versions stay downloadable
+          gh release view "v$V" >/dev/null 2>&1 || gh release create "v$V" out/*.zip --target "$GITHUB_SHA" --title "Shape Larper v$V" --notes "Shape Larper v$V. Windows: unzip and run Shape Larper.exe."
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest out/*.zip --target "$GITHUB_SHA" --title "Shape Larper (latest)" --notes "Windows: unzip ShapeLarper-win-x64.zip and run Shape Larper.exe. If SmartScreen warns, click More info, then Run anyway.
+          gh release create latest out/*.zip --target "$GITHUB_SHA" --title "Shape Larper v$V (latest)" --notes "Windows: unzip ShapeLarper-win-x64.zip and run Shape Larper.exe. If SmartScreen warns, click More info, then Run anyway.
 
           macOS: unzip and open Shape Larper.app. The app is unsigned: right-click it and choose Open, or run xattr -cr on it.
 
