@@ -17,6 +17,9 @@ jobs:
           - os: ubuntu-latest
             target: linux
     runs-on: ${{ matrix.os }}
+    # macOS runners are often unavailable; that must not block the Windows and Linux downloads
+    continue-on-error: ${{ matrix.target == 'mac' }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,7 +44,7 @@ jobs:
 
   # every push to main replaces the "latest" release with fresh downloads
   release:
-    if: github.ref == 'refs/heads/main'
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
