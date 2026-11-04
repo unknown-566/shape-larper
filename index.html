@@ -19,11 +19,11 @@ let AC;function snd(f,d=.08,ty='square',v=.04,sl=0){try{if(!CFG.vol)return;AC=AC
 const K={},M={x:W/2,y:H/2,d:0,r:0};
 let S='title',P=null,E=[],B=[],PT=[],FT=[],RG=[],LZ=[],BR=[],PV=[],TIP=null,BT=[],SEEN={},CFG={vol:1,shk:1,fl:1,aim:1},prac=0,PL=1,PB=0,sub=0,cf=0,BAN=new Set(),KC=0,own={},boss=null,stage=0,wave=0,shake=0,t=0,dt=0,last=0,hi=0,score=0,combo=0,comboT=0,cards=[],spawnQ=[],wt=0,adv=0,flash=0,lk=0,ban=null;
 try{hi=+localStorage.getItem('ng_hi')||0}catch(e){}
-const U0=()=>({dmg:1,rate:1,multi:1,pierce:0,dashCd:1,speed:1,pulse:1,bounce:0,home:0,orbs:0,shock:0,chain:0,crit:0,size:0,refl:0,graze:0,rev:0,rear:0,med:0,vamp:0,bspd:1,aura:0,adr:0}),U=U0(),dps=()=>U.dmg*U.rate*(1+(U.multi-1)*.6)*(1+U.crit*1.5)*(1+U.pierce*.08);
+const U0=()=>({dmg:1,rate:1,multi:1,pierce:0,dashCd:1,speed:1,pulse:1,bounce:0,home:0,orbs:0,shock:0,chain:0,crit:0,size:0,refl:0,graze:0,rev:0,rear:0,med:0,vamp:0,bspd:1,aura:0,adr:0,hyper:0}),U=U0(),dps=()=>U.dmg*U.rate*(1+(U.multi-1)*.6)*(1+U.crit*1.5)*(1+U.pierce*.08);
 const UP=[
 ['Overcharge','+30% shot damage',()=>U.dmg*=1.3,'💥'],
-['Hair Trigger','+20% fire rate (capped)',()=>U.rate=Math.min(2.2,U.rate*1.2),'⚡'],
-['Split Shot','One more shot per volley',()=>U.multi=Math.min(5,U.multi+1),'🔱'],
+['Hair Trigger','+20% fire rate (capped)',()=>U.rate=Math.max(U.rate,Math.min(2.2,U.rate*1.2)),'⚡'],
+['Split Shot','One more shot per volley',()=>U.multi=Math.max(U.multi,Math.min(5,U.multi+1)),'🔱'],
 ['Piercing Rounds','Shots pass through +1 target',()=>U.pierce++,'🎯'],
 ['Phase Boots','Dash recharges 30% faster',()=>U.dashCd*=.7,'👟'],
 ['Armor Plating','+1 max HP (no heal)',()=>P.mhp++,'🛡️'],
@@ -73,7 +73,7 @@ function menuDraw(){if(!['title','prac','codex','lore','set'].includes(S))return
    g.strokeStyle=e[2];g.fillStyle=e[2]+'44';g.lineWidth=3;if(e[3])poly(750,170,34,e[3],t);else{g.beginPath();g.arc(750,170,26,0,7)}g.fill();g.stroke();
    T(e[1],750,236,28,e[2]);const c=SEEN[e[0]];T(e[0][0]=='b'?'Defeated ×'+c:e[0][0]=='e'?'Killed ×'+c:'Encountered',750,266,15,'#9a96c8','center','normal');
    const y=wr(e[4],585,306,330,22,'#d8d4ff',16);wr('Tip: '+e[5],585,y+10,330,22,'#ffb84f',15)}}
- if(S=='lore'){T('Lore',W/2,56,44);const P1=[['THE GAUNTLET','Aam Saltman built it as an arena and a marketplace. Whoever reaches his throne may name any prize. Nobody has named one yet.'],['THE DEALS','Power is never free here. Every sacrifice you accept is written in red in his ledger, and he has never forgotten a debt.'],['THE GUARDIANS','Ten seals lock the way to the throne, and a guardian holds each one. You have met '+Object.keys(SEEN).filter(k=>k[0]=='b').length+' so far.']];
+ if(S=='lore'){T('Lore',W/2,56,44);const P1=[['THE GAUNTLET','Aam Saltman built it as an arena and a marketplace. Whoever reaches his throne may name any prize. Nobody has named one yet.'],['THE DEALS','Power is never free here. Every sacrifice you accept is written in red in his ledger, and he has never forgotten a debt.'],['THE GUARDIANS','Seven seals lock the way to the throne, and a guardian holds each one. You have met '+Object.keys(SEEN).filter(k=>k[0]=='b').length+' so far.']];
   let y=110;for(const [h,b] of P1){T(h,60,y,15,'#ff7a90','left');y=wr(b,60,y+26,840,22,'#d8d4ff',16)+14}
   for(let i=0;i<NB;i++){const s=('b'+i) in SEEN;T((i+1)+'.  '+(s?BS[i][0]+'  ·  '+EP[i]:'???'),60,y+i*24,15,s?BS[i][1]:'#5a5680','left','normal')}}
  if(S=='set'){T('Settings',W/2,64,44);const cy=v=>v==1?0:v+.5,nm=['Off','Half','Full'];
@@ -95,7 +95,7 @@ function deal(){cards=UP.filter(c=>!BAN.has(c[0])).sort(()=>R()-.5).slice(0,3).m
  if(R()<.25){const ok=SAC.filter(s=>!BAN.has(s[0])&&(s[4]=='hp'?P.hp>1:P.mhp>2));if(ok.length)cards[R()*3|0]=ok[R()*ok.length|0]}PV=cards.map(preview)}
 function banish(){const i=cards.findIndex((c,i)=>M.x>45+i*300&&M.x<315+i*300&&M.y>170&&M.y<470);if(i<0||!(P.bn>0))return;BAN.add(cards[i][0]);P.bn--;
  const pl=UP.filter(c=>!BAN.has(c[0])&&!cards.includes(c));if(pl.length)cards[i]=pl[R()*pl.length|0];PV=cards.map(preview);snd(200,.25,'sawtooth',.06,-100)}
-function bar(){see('br');BR.push({y:-26,h:26,t:0});txt(W/2,50,'HYPERDRIVE OVER THE BAR','#ffe14a');snd(120,.4,'square',.06,40)}
+function hbar(){see('br');BR.push({y:-26,h:26,t:0});txt(W/2,50,'HYPERDRIVE OVER THE BAR','#ffe14a');snd(120,.4,'square',.06,40)}
 function brUpd(){for(const z of BR){z.t+=dt;if(z.t<.7)continue;z.y+=170*dt;if(P.y+P.r>z.y&&P.y-P.r<z.y+z.h&&!(P.ph>0)){if(!(P.ih>0))hurt();if(P.dt>0)P.dt=0}}BR=BR.filter(z=>z.y<H+30)}
 function tipDraw(){if(!TIP)return;const o=TIP.o,L=[o.n>1?o.nm+' ×'+o.n:o.nm,...o.d.split('|'),...o.k.map(k=>{const s=ST.find(q=>q[0]==k);return s?'Now: '+s[1]+' '+fm(val(k),s[2]):''}).filter(Boolean)];
  g.font=`13px ${F}`;let w=0;for(const l of L)w=Math.max(w,g.measureText(l).width);w+=22;const h=L.length*18+12,x=cl(TIP.x-w/2,6,W-w-6),y=TIP.y-h-18;
@@ -164,7 +164,7 @@ function pb(x,y,a){const k=R()<U.crit;B.push({x,y,vx:Math.cos(a)*740,vy:Math.sin
 function burst(x,y,c,n=12,sp=250){for(let i=0;i<n;i++){const a=R()*7,s=R()*sp,l=.4+R()*.5;PT.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l,m:l,c})}}
 function txt(x,y,s,c='#fff'){FT.push({x,y,s,c,l:1})}
 function hurt(){rumble(.25,.8);P.hp--;P.inv=1.3;P.ih=1.3;shake=16;combo=0;flash=.25;snd(110,.35,'sawtooth',.12,-60);burst(P.x,P.y,'#fff',22,300);
- if(P.hp<=0){if(U.rev>0){U.rev--;P.hp=3;P.inv=2;pulse();txt(P.x,P.y-24,'SECOND WIND','#fff');return}S='over';lk=1.2;burst(P.x,P.y,'#5ef2ff',70,500);fin()}}
+ if(P.hp<=0){if(U.rev>0){U.rev--;P.hp=3;P.inv=2;const pc=P.pc;pulse();P.pc=pc;txt(P.x,P.y-24,'SECOND WIND','#fff');return}S='over';lk=1.2;burst(P.x,P.y,'#5ef2ff',70,500);fin()}}
 function dmgE(e,d){e.hp-=d;e.hit=.1;snd(210,.04,'triangle',.04);burst(e.x,e.y,e.c,3,120);if(e.hp<=0&&!e.dead){e.dead=1;kill(e)}}
 function kill(e){SEEN['e'+e.k]++;burst(e.x,e.y,e.c,18);snd(150,.12,'sawtooth',.06,-80);combo++;comboT=3;const p=Math.round(100*(1+combo*.1));score+=p;
  P.pc=Math.min(100,P.pc+7*U.pulse);txt(e.x,e.y,'+'+p,e.c);
@@ -199,7 +199,7 @@ function bossUpd(){const b=boss,f=b.hp/b.mhp;b.t+=dt;b.hit-=dt;b.sh-=dt;if(b.big
  else if(b.n==2){b.x+=(W/2-b.x)*3*dt;b.y+=(150-b.y)*3*dt;b.sp+=dt*(.7+(1-f)*.5);
   const arms=f<.5?3:2;if(tk('s',.16))for(let k=0;k<arms;k++)eb(b.x,b.y,b.sp*2+k*2*PI/arms,185,4,'#aef7ff');
   if(tk('r',4.2)){const o=R()*6;for(let i=0;i<20;i++)eb(b.x,b.y,o+i*PI/10,145,i%2?5:8,i%2?'#ff5a7a':'#ffb0b0',i%2?0:1)}
-  if(tk('w',6.5)){if(U.hyper&&R()<.4){bar();return}const gp=90+R()*(W-180);for(let x=20;x<W;x+=34)if(Math.abs(x-gp)>70)eb(x,-10,PI/2,170,7,'#ff1744',2)}
+  if(tk('w',6.5)){if(U.hyper&&R()<.4)hbar();else{const gp=90+R()*(W-180);for(let x=20;x<W;x+=34)if(Math.abs(x-gp)>70)eb(x,-10,PI/2,170,7,'#ff1744',2)}}
   if(f<.4&&tk('e',6.5)){spawn(1,b.x-80,b.y+60);spawn(1,b.x+80,b.y+60)}}
  else if(b.n==3){b.mt=(b.mt??6)-dt;if(b.mt<=0){b.m=b.m=='dn'?'up':'dn';b.mt=b.m=='dn'?4:6.5;b.land=b.m=='dn'}
   const dn=b.m=='dn';
@@ -218,7 +218,7 @@ function bossUpd(){const b=boss,f=b.hp/b.mhp;b.t+=dt;b.hit-=dt;b.sh-=dt;if(b.big
   if(tk('s',.2)){const arms=f<.5?4:2;for(let k=0;k<arms;k++)eb(b.x,b.y,b.sp*2+k*2*PI/arms,175,4,'#ffb08a')}
   if(tk('r',3.6)){const o=R()*6;for(let i=0;i<22;i++)eb(b.x,b.y,o+i*PI/11,150,i%2?5:8,'#ffb08a',i%2?0:1)}
   if(tk('l',3.4))las(P.x,0);
-  if(f<.75&&tk('w',7)){if(U.hyper&&R()<.4){bar();return}const gp=90+R()*(W-180);for(let x=20;x<W;x+=34)if(Math.abs(x-gp)>66)eb(x,-10,PI/2,175,7,'#ff1744',2)}
+  if(f<.75&&tk('w',7)){if(U.hyper&&R()<.4)hbar();else{const gp=90+R()*(W-180);for(let x=20;x<W;x+=34)if(Math.abs(x-gp)>66)eb(x,-10,PI/2,175,7,'#ff1744',2)}}
   if(f<.5&&tk('l2',4))las(P.y,1);
   if(f<.5&&tk('a',2.2)){const q=ang(b,P);for(let i=-3;i<=3;i++)eb(b.x,b.y,q+i*.14,285,i?5:8,i?'#ffd0b0':'#ff1744',i?0:2)}
   if(f<.3&&tk('e',6)){spawn(4,b.x-120,b.y+80);spawn(3,b.x+120,b.y+80)}}
