@@ -17,7 +17,7 @@ addEventListener('resize',fit);fit();
 const ang=(a,b)=>Math.atan2(b.y-a.y,b.x-a.x),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 let AC;function snd(f,d=.08,ty='square',v=.04,sl=0){try{if(!CFG.vol)return;AC=AC||new AudioContext();if(AC.state=='suspended')AC.resume();const n=AC.currentTime,o=AC.createOscillator(),a=AC.createGain();o.type=ty;o.frequency.setValueAtTime(f,n);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+sl),n+d);a.gain.setValueAtTime(v*CFG.vol,n);a.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(a);a.connect(AC.destination);o.start();o.stop(n+d)}catch(e){}}
 const K={},M={x:W/2,y:H/2,d:0,r:0},MU={x:W/2,y:H/2};
-let S='title',P=null,E=[],B=[],PT=[],FT=[],RG=[],LZ=[],BR=[],PV=[],TIP=null,BT=[],SEEN={},CFG={vol:1,shk:1,fl:1,aim:1,wm:0},prac=0,NP=0,PL=1,PB=0,sub=0,cf=0,BAN=new Set(),KC=0,own={},boss=null,stage=0,wave=0,shake=0,t=0,dt=0,last=0,hi=0,score=0,combo=0,comboT=0,cards=[],spawnQ=[],wt=0,adv=0,flash=0,lk=0,ban=null;
+let S='title',P=null,E=[],B=[],PT=[],FT=[],RG=[],LZ=[],BR=[],PV=[],TIP=null,BT=[],SEEN={},CFG={vol:1,shk:1,fl:1,aim:1,wm:window.SL?1:0},prac=0,NP=0,PL=1,PB=0,sub=0,cf=0,BAN=new Set(),KC=0,own={},boss=null,stage=0,wave=0,shake=0,t=0,dt=0,last=0,hi=0,score=0,combo=0,comboT=0,cards=[],spawnQ=[],wt=0,adv=0,flash=0,lk=0,ban=null;
 try{hi=+localStorage.getItem('ng_hi')||0}catch(e){}
 const U0=()=>({dmg:1,rate:1,multi:1,pierce:0,dashCd:1,speed:1,pulse:1,bounce:0,home:0,orbs:0,shock:0,chain:0,crit:0,size:0,refl:0,graze:0,rev:0,rear:0,med:0,vamp:0,bspd:1,aura:0,adr:0,hyper:0}),U=U0(),ED=()=>Math.pow(1.087,NP),PW=()=>{const r=dps()/ED();return ED()*Math.pow(r,r<1?.5:.25)},dps=()=>U.dmg*U.rate*(1+(U.multi-1)*.6)*(1+U.crit*1.5)*(1+U.pierce*.08);
 const UP=[
@@ -61,7 +61,7 @@ function ENTS(){return[['e0','Chaser','#ff4fa3',3,'Rushes straight at you. Fragi
 function menuDraw(){if(!['title','prac','codex','lore','set','wmfail'].includes(S))return;dim(S=='title'?.5:.85);
  if(S=='title'){T('SHAPE LARPER',W/2,140,76,'#5ef2ff');T('Aam Saltman built the Gauntlet and trades power for blood.',W/2,200,19,'#ff7a90','center','normal');T('Every shot is yours to aim. Reach his throne.',W/2,228,17,'#d8d4ff','center','normal');
   [['Start run',go],['Mode: '+(CFG.wm?'Windows':'Classic'),()=>{CFG.wm^=1;saveD()}],['Practice',()=>S='prac'],['Codex',()=>S='codex'],['Lore',()=>S='lore'],['Settings',()=>S='set']].forEach((q,i)=>btn(q[0],350,256+i*50,260,42,q[1],{sz:21,c:i==1&&CFG.wm?'#ffe14a':undefined}));
-  if(hi)T('Best '+hi,W/2,566,17,'#9a96c8','center','normal');if(CFG.wm)T('Windows mode: every enemy gets its own pop-up window. Desktop Chrome or Edge, pop-ups allowed.',W/2,590,13,'#ffb84f','center','normal');T('WASD move  ·  Mouse aim  ·  Hold click fire  ·  Space dash  ·  Q or right-click pulse  ·  F fullscreen',W/2,614,14,'#9a96c8','center','normal');return}
+  if(hi)T('Best '+hi,W/2,566,17,'#9a96c8','center','normal');if(CFG.wm)T(window.SL?'Windows mode: every enemy gets its own window on your desktop.':'Windows mode: every enemy gets its own pop-up window. Desktop Chrome or Edge, pop-ups allowed.',W/2,590,13,'#ffb84f','center','normal');T('WASD move  ·  Mouse aim  ·  Hold click fire  ·  Space dash  ·  Q or right-click pulse  ·  F fullscreen',W/2,614,14,'#9a96c8','center','normal');return}
  if(S=='prac'){T('Practice',W/2,64,44);const ok=('b'+PB) in SEEN;T('Fight any guardian you have already met.',W/2,104,16,'#9a96c8','center','normal');
   for(let i=0;i<NB;i++){const s=('b'+i) in SEEN;btn(s?BS[i][0]:'? ? ?',60+(i%2)*250,150+(i/2|0)*54,240,46,()=>{if(s)PB=i},{sel:PB==i,c:s?BS[i][1]:'#5a5680'})}
   T('Loadout',730,160,20,'#fff');['Bare','Mid · 4 upgrades','Stacked · 9 upgrades'].forEach((l,j)=>btn(l,580,180+j*52,300,44,()=>PL=j,{sel:PL==j}));
@@ -376,8 +376,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&S=='play'&
 addEventListener('keydown',e=>{if(e.code=='KeyF'&&!e.repeat){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})}catch(_){}}});
 /* windows mode: the player, every enemy and every boss live in their own real browser window.
    One simulation runs here; each pop-up is a same-origin about:blank page we draw into directly. */
-let WM=0,WP=null,WSC=2,WOX=-1,WOY=-1,CX=0,CY=0,MSX=null,MSY=0,MSRC=0,EID=0,CW=0,CL=0,SX=0,SY=0,VW=null,LL=0,LG=0,WRT=null;
-const WE=new Map(),WCAP=10,WMAX=12,PWW=768,PWH=512,EWS=200,BWS=420,WMK=.9,
+const NAT=!!(window.SL&&SL.native);let WM=0,WP=null,MV=[],WSC=2,WOX=-1,WOY=-1,CX=0,CY=0,MSX=null,MSY=0,MSRC=0,EID=0,CW=0,CL=0,SX=0,SY=0,VW=null,LL=0,LG=0,WRT=null;
+const WE=new Map(),WCAP=NAT?1e9:10,WMAX=NAT?48:12,PWW=768,PWH=512,EWS=200,BWS=420,WMK=.9,
  ENAME=['Chaser','Shooter','Bomber','Charger','Spinner','Bulwark','Splitter'];
 const scr=()=>{const s=screen;return{x:s.availLeft||0,y:s.availTop||0,w:s.availWidth||innerWidth,h:s.availHeight||innerHeight}};
 const wox=()=>Math.max(0,WOX),woy=()=>Math.max(0,WOY);
@@ -395,23 +395,24 @@ function wmOpen(key,iw,ih,cx,cy,title,kind){let w=null;
  return r}
 const wmOpenPlayer=()=>{const s=scr();return wmOpen('p',PWW,PWH,s.x+s.w/2,s.y+s.h/2,'Shape Larper','p')};
 // must run inside a click or key press so the browser lets the first pop-up through
-function wmStart(cb){WRT=cb;WOX=WOY=-1;const p=wmOpenPlayer();if(!p){S='wmfail';return}
- let q=null;try{q=open('','sl_test','popup=1,width=120,height=80,left=0,top=0')}catch(e){}
- if(!q){try{p.w.close()}catch(_){}S='wmfail';return}try{q.close()}catch(_){}
- WP=p;WM=1;const sc=scr();WSC=WMK*Math.min(sc.w/W,sc.h/H);MSX=null;MSRC=0;cb();try{p.w.focus()}catch(_){}sched(p.w)}
-function wmStop(){const was=WM||WP;for(const r of WE.values())try{r.w.close()}catch(_){}WE.clear();if(WP)try{WP.w.close()}catch(_){}WP=null;WM=0;MSX=null;if(was)sched(window)}
-function wmReopen(){const p=wmOpenPlayer();if(!p){WRT=null;S='wmfail';wmStop();return}WP=p;sched(p.w)}
-function wmLost(){if(S=='play')S='pause';for(const r of WE.values())try{r.w.close()}catch(_){}WE.clear();WP=null}
+function wmStart(cb){WRT=cb;WOX=WOY=NAT?0:-1;const p=wmOpenPlayer();if(!p){S='wmfail';return}
+ if(!NAT){let q=null;try{q=open('','sl_test','popup=1,width=120,height=80,left=0,top=0')}catch(e){}
+  if(!q){try{p.w.close()}catch(_){}S='wmfail';return}try{q.close()}catch(_){}}
+ WP=p;WM=1;const sc=scr();WSC=WMK*Math.min(sc.w/W,sc.h/H);MSX=null;MSRC=0;cb();try{p.w.focus()}catch(_){}if(NAT)SL.main(0);sched(p.w)}
+function wmStop(){const was=WM||WP;for(const r of WE.values())try{r.w.close()}catch(_){}WE.clear();if(WP)try{WP.w.close()}catch(_){}WP=null;WM=0;MSX=null;if(was){sched(window);if(NAT)SL.main(1)}}
+function wmReopen(){const p=wmOpenPlayer();if(!p){WRT=null;S='wmfail';wmStop();return}WP=p;if(NAT)SL.main(0);sched(p.w)}
+function wmLost(){if(NAT)SL.main(1);if(S=='play')S='pause';for(const r of WE.values())try{r.w.close()}catch(_){}WE.clear();WP=null}
 function wmBlur(){setTimeout(()=>{if(!WM)return;let f=document.hasFocus();for(const r of [WP,...WE.values()])try{if(r&&!r.w.closed&&r.w.document.hasFocus())f=1}catch(_){}if(!f)lostFocus()},80)}
 // mouse: screen coords give both the aim point in the world and, in the player window, the UI point
 function wmMouse(r,e){const w=r.w;CL=r.kind=='p'?1:2;
- if(e.screenX||e.screenY){const ox=e.screenX-e.clientX-w.screenX,oy=e.screenY-e.clientY-w.screenY;if(ox>=0&&ox<60&&oy>=0&&oy<200){WOX=ox;WOY=oy}MSX=e.screenX;MSY=e.screenY;MSRC=1}
+ if(!NAT&&(e.screenX||e.screenY)){const ox=e.screenX-e.clientX-w.screenX,oy=e.screenY-e.clientY-w.screenY;if(ox>=0&&ox<60&&oy>=0&&oy<200){WOX=ox;WOY=oy}MSX=e.screenX;MSY=e.screenY;MSRC=1}
+ if(NAT&&(e.screenX||e.screenY)){MSX=e.screenX;MSY=e.screenY;MSRC=1}
  if(r.kind=='p'){const s=Math.min(w.innerWidth/W,w.innerHeight/H);MU.x=(e.clientX-(w.innerWidth-W*s)/2)/s;MU.y=(e.clientY-(w.innerHeight-H*s)/2)/s}
  wmAim()}
 function wmAim(){if(MSRC&&MSX!=null&&P){M.x=P.x+(MSX-CX)/WSC;M.y=P.y+(MSY-CY)/WSC}}
 // camera: the player is always drawn at the centre of the player window's content
 function wmPre(){if(!WP)return;const w=WP.w;if(w.closed){wmLost();return}
- if(WOX<0&&w.outerWidth>0){WOX=Math.max(0,(w.outerWidth-w.innerWidth)/2);WOY=Math.max(0,w.outerHeight-w.innerHeight-WOX)}
+ if(!NAT&&WOX<0&&w.outerWidth>0){WOX=Math.max(0,(w.outerWidth-w.innerWidth)/2);WOY=Math.max(0,w.outerHeight-w.innerHeight-WOX)}
  CX=w.screenX+wox()+(w.innerWidth||PWW)/2;CY=w.screenY+woy()+(w.innerHeight||PWH)/2;wmAim()}
 const wpos=e=>({x:CX+(e.x-P.x)*WSC,y:CY+(e.y-P.y)*WSC});
 const inS=(c,s,m)=>c.x>s.x-m&&c.x<s.x+s.w+m&&c.y>s.y-m&&c.y<s.y+s.h+m;
@@ -426,8 +427,8 @@ function wmSync(){if(!P)return;const s=scr(),want=new Map();let ch=0;
   const far=!inS(c,s,0);if(!r&&!b&&!inS(c,s,-10))continue;const qx=cl(c.x,s.x+z/2,s.x+s.w-z/2),qy=cl(c.y,s.y+z/2,s.y+s.h-z/2),pin=qx!=c.x||qy!=c.y;c.x=qx;c.y=qy;
   if(!r){r=wmOpen(k,z,z,c.x,c.y,b?e.name:ENAME[e.k],b?'b':'e');if(!r)continue;WE.set(k,r);ch=1}
   r.e=e;r.pin=pin;r.far=far;const nx=Math.round(c.x-z/2-wox()),ny=Math.round(c.y-z/2-woy());
-  if(nx!==r.lx||ny!==r.ly){try{r.w.moveTo(nx,ny)}catch(_){}r.lx=nx;r.ly=ny}guard(r)}
- guard(WP);if(ch)try{WP.w.focus()}catch(_){}}
+  if(nx!==r.lx||ny!==r.ly){if(NAT)MV.push(['sl_'+k,nx,ny]);else try{r.w.moveTo(nx,ny)}catch(_){}r.lx=nx;r.ly=ny}guard(r)}
+ guard(WP);if(NAT){if(MV.length)SL.move(MV);MV=[]}else if(ch)try{WP.w.focus()}catch(_){}}
 function wmRender(){if(!WP||WP.w.closed||!P)return;wmSync();for(const r of [WP,...WE.values()])if(!r.w.closed)try{wmDraw(r)}catch(_){}}
 // draw the slice of the world that sits behind this window on the desktop
 function wmDraw(r){const w=r.w,d=w.devicePixelRatio||1,iw=w.innerWidth||r.iw,ih=w.innerHeight||r.ih,bw=Math.round(iw*d),bh=Math.round(ih*d);
@@ -453,5 +454,6 @@ function statusDraw(){g.fillStyle='#07060f';g.fillRect(0,0,W,H);T('SHAPE LARPER'
  T('The game is running in its own windows.',W/2,250,20,'#d8d4ff','center','normal');T('Esc or P pauses  ·  keep this tab open',W/2,282,16,'#9a96c8','center','normal');
  btn(S=='pause'?'Resume':'Pause',W/2-130,330,260,46,()=>{S=S=='pause'?'play':S=='play'?'pause':S});btn('End run',W/2-130,390,260,46,toMenu)}
 addEventListener('pagehide',wmStop);
+if(NAT)SL.onCursor((x,y)=>{if(WM){MSX=x;MSY=y;MSRC=1}});
 sched(window);setInterval(()=>{if(performance.now()-LL>300)sched(window)},250);
 </script></body></html>

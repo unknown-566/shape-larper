@@ -1,0 +1,18 @@
+{
+  "name": "shape-larper",
+  "productName": "Shape Larper",
+  "version": "0.2.0",
+  "description": "Bullet hell arcade where every enemy lives in its own window",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-packager . \"Shape Larper\" --platform=win32 --arch=x64 --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\"",
+    "build:mac": "electron-packager . \"Shape Larper\" --platform=darwin --arch=universal --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\"",
+    "build:linux": "electron-packager . \"Shape Larper\" --platform=linux --arch=x64 --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\""
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "44.9.2"
+  }
+}
