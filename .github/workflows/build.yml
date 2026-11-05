@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
     tags: ['v*']
-    paths: ['index.html', 'desktop.js', 'menus.js', 'updates.js', 'effects.js', 'progression.js', 'multiplayer.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
+    paths: ['index.html', 'desktop.js', 'menus.js', 'updates.js', 'effects.js', 'relay-client.js', 'relay/**', 'render.yaml', 'progression.js', 'multiplayer.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
 jobs:
   build:
     strategy:
@@ -27,6 +27,12 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build:${{ matrix.target }}
+      - name: Package deployable relay (Windows)
+        if: matrix.target == 'win'
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          Compress-Archive -Path relay,render.yaml -DestinationPath "dist/ShapeLarper-Relay-v$version.zip"
       - name: Zip (macOS)
         if: matrix.target == 'mac'
         run: ditto -c -k --keepParent "dist/Shape Larper-darwin-universal/Shape Larper.app" ShapeLarper-mac-universal.zip

@@ -1,0 +1,16 @@
+{
+  "name": "shape-larper-relay",
+  "version": "0.4.4",
+  "private": true,
+  "description": "Two-player WebSocket room relay for Shape Larper",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "ws": "8.22.1"
+  }
+}

@@ -3,12 +3,21 @@
 let desktopPending=false,desktopTransition=0,desktopNeedsPresent=false;
 let desktopRects=[],desktopPointer={x:0,y:0,seen:false};
 const desktopBar={hf:0};
+const playerFollow={x:null,y:null,stamp:-1},bossFollow={x:null,y:null,vx:0,vy:0,stamp:-1,id:null,side:'above'};
+function resetDesktopMotion(){Object.assign(playerFollow,{x:null,y:null,stamp:-1});Object.assign(bossFollow,{x:null,y:null,vx:0,vy:0,stamp:-1,id:null,side:'above'})}
 function desktopLayout(){
  const width=innerWidth,height=innerHeight;
  const panelScale=cl(Math.min(width/1440,height/900),.35,2)*(CFG.panelScale||1);
  const playerWidth=Math.min(width-24,768*panelScale),playerHeight=Math.min(height-110,512*panelScale);
  const player={kind:'p',x:(width-playerWidth)/2,y:cl(height*.56-playerHeight/2,78,height-playerHeight-16),w:playerWidth,h:playerHeight};
  if(NET.connected&&P){const z=cl(Math.min(width/W,height/H)*.9,.3,4);player.x=cl(width/2+(P.x-W/2)*z-playerWidth/2,12,width-playerWidth-12);player.y=cl(height/2+(P.y-H/2)*z-playerHeight/2,78,height-playerHeight-16)}
+ if(P&&!NET.connected){
+  const mx=Number.isFinite(P.mvx)?P.mvx:0,my=Number.isFinite(P.mvy)?P.mvy:0;
+  const tx=cl(player.x+mx*Math.min(85,width*.08),12,width-playerWidth-12),ty=cl(player.y+my*Math.min(58,height*.07),78,height-playerHeight-16);
+  if(playerFollow.x===null){playerFollow.x=tx;playerFollow.y=ty}
+  if(playerFollow.stamp!==t){const k=1-Math.exp(-6*Math.min(.05,dt)*(S==='play'?1:PICK.active?PICK.scale:0));playerFollow.x+=(tx-playerFollow.x)*k;playerFollow.y+=(ty-playerFollow.y)*k;playerFollow.stamp=t}
+  player.x=cl(playerFollow.x,12,width-playerWidth-12);player.y=cl(playerFollow.y,78,height-playerHeight-16);
+ }
  const uiScale=Math.min(width/1008,height/688)*(CFG.uiScale||1);
  // A larger interface still fits: crop-free menus take precedence over magnification.
  const ui=Math.min(uiScale,(width-24)/W,(height-24)/H);
@@ -92,6 +101,20 @@ function desktopHud(panel,layout){
  T('ESC · PAUSE',width-12,height-16,10,'#9d96bb','right');
  g.restore();
 }
+function desktopBossAnchor(layout){
+ if(!boss){bossFollow.id=null;return null}
+ const panel=desktopRects.find(r=>r.kind==='b');if(!panel)return null;
+ const scale=cl(layout.panelScale,.58,1.15),w=Math.min(layout.width-24,480*scale),h=64*scale;
+ const center=CX+(boss.x-desktopCamera().x)*WSC;
+ if(P.y<boss.y-24)bossFollow.side='below';else if(P.y>boss.y+24)bossFollow.side='above';
+ const cy=CY+(boss.y-desktopCamera().y)*WSC,radius=boss.r*WSC;
+ let targetY=bossFollow.side==='below'?cy+radius+14:cy-radius-h-14;
+ const tx=cl(center-w/2,8,layout.width-w-8),ty=cl(targetY,8,layout.height-h-8),id=stage+':'+boss.n;
+ if(bossFollow.id!==id||bossFollow.x===null){Object.assign(bossFollow,{id,x:tx,y:ty,vx:0,vy:0,stamp:t})}
+ if(bossFollow.stamp!==t){const elapsed=Math.min(.05,dt),steps=3,d=elapsed/steps;for(let i=0;i<steps;i++){bossFollow.vx+=(100*(tx-bossFollow.x)-20*bossFollow.vx)*d;bossFollow.vy+=(100*(ty-bossFollow.y)-20*bossFollow.vy)*d;bossFollow.x+=bossFollow.vx*d;bossFollow.y+=bossFollow.vy*d}bossFollow.stamp=t}
+ bossFollow.x=cl(bossFollow.x,8,layout.width-w-8);bossFollow.y=cl(bossFollow.y,8,layout.height-h-8);
+ return{x:bossFollow.x,y:bossFollow.y,w,h,targetX:tx,targetY:ty,side:bossFollow.side};
+}
 function desktopRender(){
  const layout=desktopLayout();g=g0;CW=1;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.setTransform(DK,0,0,DK,0,0);
  desktopPre();desktopContain();desktopRects=desktopPanels(layout);const j=desktopShake();g.save();g.translate(j.x,j.y);
@@ -109,12 +132,13 @@ function desktopRender(){
  const player=layout.player;
  g.strokeStyle='#5ef2ff88';g.lineWidth=2;g.strokeRect(player.x+1,player.y+1,player.w-2,player.h-2);
  desktopHud(player,layout);
- if(boss){const scale=cl(layout.panelScale,.65,1.4),w=Math.min(layout.width-32,520*scale),h=64*scale;g.save();g.translate((layout.width-w)/2,12);g.scale(w/520,h/64);bossBar(desktopBar,520,64);g.restore()}
  if(flash>0&&CFG.fl){g.save();g.beginPath();for(const r of desktopRects)g.rect(r.x,r.y,r.w,r.h);g.clip();g.fillStyle=`rgba(${FLC},${flash*.35})`;g.fillRect(0,0,layout.width,layout.height);g.restore()}
- for(const r of desktopRects)impactFrame(r.x,r.y,r.w,r.h,r.kind==='p'?(P.ih>0?'#ff387b':'#7befff'):r.e?.c||'#bd8cff');g.restore();
+ for(const r of desktopRects)impactFrame(r.x,r.y,r.w,r.h,r.kind==='p'?(P.ih>0?'#ff387b':'#7befff'):r.e?.c||'#bd8cff');
+ if(S==='play'&&ban){g.save();const bw=Math.min(680,layout.width-32),bx=(layout.width-bw)/2;g.globalAlpha=Math.min(1,ban.t);g.fillStyle='#090817e8';g.fillRect(bx,8,bw,62);cardText(ban.a,layout.width/2,26,bw-24,14,'#b6a4d2');cardText(ban.b,layout.width/2,50,bw-24,24,'#fff');g.restore()}
+ const anchor=desktopBossAnchor(layout);if(anchor){g.save();g.translate(anchor.x,anchor.y);g.scale(anchor.w/520,anchor.h/64);bossBar(desktopBar,520,64);g.restore()}g.restore();
  if(S!='play'){g.fillStyle='#04030ab8';g.fillRect(0,0,layout.width,layout.height)}
  g.save();g.translate(layout.ux,layout.uy);g.scale(layout.ui,layout.ui);
- if(S=='play'){banDraw();toastDraw();progressHud()}else{overlays();toastDraw();tipDraw()}
+ if(S=='play'){toastDraw();progressHud()}else{overlays();toastDraw();tipDraw()}
  g.restore();document.documentElement.classList.toggle('desktop-playing',S=='play');
  if(desktopNeedsPresent){desktopNeedsPresent=false;SL.present()}
 }

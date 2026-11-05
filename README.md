@@ -8,6 +8,14 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
+## v0.4.4: co-op menus and online relay
+
+- Upgrade points open the card menu automatically. The world eases into slow motion, then freezes once both pilots have received the menu. Either pilot can choose the single team upgrade; play resumes after both finish or defer. Card descriptions, stat previews and costs have separate areas. Hover lifts, tilts and highlights cards.
+- The player panel follows movement with a soft lag; its upgrade control and credit readout travel with it. The boss health bar springs toward the boss, appears in front of panel chrome, and moves below the boss when the player is above it. It remains on-screen. Desktop wave announcements use a compact top banner.
+- **Online · room code** adds outbound WebSocket relay transport alongside LAN. Both players must run v0.4.4. No public relay is bundled or running: deploy the included server, then enter its WSS address and access key in the game. The host creates a room; the second pilot enters its code.
+
+**Deployment:** [Czech relay guide](relay/README.md), `render.yaml`, Dockerfile and the `ShapeLarper-Relay-v0.4.4.zip` release asset. The server was tested locally with browser and Electron clients, including room pairing and synchronized menus; cloud deployment and your school network still require verification. Outbound WSS avoids relying on incoming LAN connections, but a network can also block WSS or the hosting domain. Do not assume any transport works on every network.
+
 ## v0.4.3: impact effects
 
 Stronger shared panel shake, expanding shockwaves, radial sparks and illuminated panel corners on dash, kills, damage, pulses and boss phases/deaths. Settings offers Impact effects: Off / Soft / Full / Overdrive. Screen shake and Flashes remain independent switches. Low graphics caps simultaneous impact bursts at eight and reduces ray counts. LAN forwards impact events to the other pilot. The native desktop window remains stationary; the compositor moves panel masks, world and chrome together and compensates aim coordinates.

@@ -1,6 +1,16 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.3
+## Current implementation: v0.4.4
+
+User requested relay prepared for deployment (no hosting account), not a live public service. relay/server.js + own pinned ws dependency/lock implement authenticated optional-key WebSocket rooms, bounds/rate/backpressure, heartbeat and cleanup. render.yaml is a free-plan Node service with generated access key; Docker is an alternative. relay-client.js connects from renderer using WSS (plain WS loopback tests only). netSend routes to relay or existing LAN; event handling shared in handleNetEvent(). LAN protocol bumped to shape-larper-044. Root Windows build excludes server deps. Release also includes a small relay-source ZIP; never include relay/node_modules. No cloud deployment or school-network testing was performed.
+
+progression.js PICK tracks per-session id, arrived/ready flags, scale and shared choice. simulationStep() replaces direct upd() in the frame loop: decelerates over ~0.45s, holds at .12 until both clients acknowledge menu arrival, then freezes at zero. Host owns simulation; both players see the same serialized card choices/previews and either can choose. Both ready resumes. Action messages include runId/session id. Point acquisition automatically opens menu; defer keeps choices. Tests that call choose directly must first advance simulationStep until scale zero. Fullrun test now seeds RNG and advances this state machine.
+
+Cards use separate description/stat/cost regions with hover lift/tilt; hit testing uses cardHit. Player panel softly follows movement; upgrade button coordinates attach to that panel, tracked by upgradeButton/upgradeHit. Boss bar follows a damped spring above/below actual boss position with hysteresis and screen clamp, drawn over chrome; compact top wave banner avoids card/HUD conflicts.
+
+Tests: relay.js, relay-game.js, native-coop.js with SHAPE_TEST_RELAY=1 (also supports packaged EXE path), coop-progression.js, menu-follow.js, impact-effects.js, desktop-overlay.js, panel-boundaries.js, updater-ui.js and deterministic fullrun2.js. Render/Docker files are prepared, not cloud-tested.
+
+## Previous implementation: v0.4.3
 
 effects.js adds bounded world impact rings/rays, panel corner highlights, and LAN impact events. CFG.impact defaults 1.35; settings offers 0/.6/1.35/2. CFG.shk and CFG.fl independently control motion/flashes. Desktop presentation wraps masks, world, frames and HUD in one translation (capped at 10 CSS px); desktopPre subtracts that translation for mouse aim. Menus do not shake. Containment reserves additional margin. Do not move OS windows or apply per-entity coordinate offsets. tests/impact-effects.js checks aim, unchanged simulation positions, one world draw, low-FX bounds and switches. native-coop.js also asserts effect delivery.
 

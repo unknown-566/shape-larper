@@ -1,15 +1,15 @@
 {
   "name": "shape-larper",
   "productName": "Shape Larper",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Bullet hell roguelite with synchronized transparent desktop panels",
   "main": "electron/main.js",
   "private": true,
   "scripts": {
     "start": "electron .",
     "build:win": "electron-builder --win nsis zip --x64 --publish never",
-    "build:mac": "electron-packager . \"Shape Larper\" --platform=darwin --arch=universal --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\"",
-    "build:linux": "electron-packager . \"Shape Larper\" --platform=linux --arch=x64 --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\""
+    "build:mac": "electron-packager . \"Shape Larper\" --platform=darwin --arch=universal --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\" --ignore=\"^/relay(/|$)\"",
+    "build:linux": "electron-packager . \"Shape Larper\" --platform=linux --arch=x64 --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\" --ignore=\"^/relay(/|$)\""
   },
   "devDependencies": {
     "@electron/packager": "20.3.0",
@@ -39,7 +39,8 @@
       "package.json",
       "progression.js",
       "multiplayer.js",
-      "effects.js"
+      "effects.js",
+      "relay-client.js"
     ],
     "publish": [
       {

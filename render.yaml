@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: shape-larper-relay
+    runtime: node
+    plan: free
+    rootDir: relay
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: RELAY_KEY
+        generateValue: true
