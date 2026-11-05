@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');const {WebSocket}=require('../relay/n
  try{const a=await client();send(a,{type:'create',key:'test-key'});const {code}=await get(a,'room');assert.match(code,/^[A-F0-9]{12}$/);const wrong=await client();send(wrong,{type:'join',code,key:'wrong'});assert.match((await get(wrong,'error')).error,/key/);
  const b=await client();send(b,{type:'join',code,key:'test-key'});assert.equal((await get(a,'connected')).role,'host');assert.equal((await get(b,'connected')).role,'guest');send(a,{type:'data',message:{type:'state',sequence:123}});assert.equal((await get(b,'message')).message.sequence,123);
  const third=await client();send(third,{type:'join',code,key:'test-key'});assert.match((await get(third,'error')).error,/full/);b.close();await get(a,'disconnected');await new Promise(r=>setTimeout(r,30));assert.equal(relay.rooms.size,0);
- const incompatible=await client();incompatible.send(JSON.stringify({protocol:'old',type:'create'}));assert.match((await get(incompatible,'error')).error,/0.4.5/);
+ const incompatible=await client();incompatible.send(JSON.stringify({protocol:'old',type:'create'}));assert.match((await get(incompatible,'error')).error,/0\.4\.8/);
  console.log('PASS: relay room create/join, access key, forwarding, capacity, disconnect cleanup and protocol rejection');
  }finally{for(const ws of sockets)ws.terminate();await relay.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

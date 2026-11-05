@@ -1,6 +1,6 @@
 const http=require('node:http'),crypto=require('node:crypto');
 const {WebSocketServer,WebSocket}=require('ws');
-const PROTOCOL='shape-larper-045',MAX=512*1024;
+const PROTOCOL='shape-larper-048',MAX=512*1024;
 function createRelay({key=process.env.RELAY_KEY||'',maxRooms=50}={}){
  const rooms=new Map();
  const server=http.createServer((req,res)=>{res.writeHead(req.url==='/health'?200:404,{'Content-Type':'application/json'});res.end(JSON.stringify(req.url==='/health'?{ok:true,protocol:PROTOCOL}:{error:'Not found'}))});
@@ -15,7 +15,7 @@ function createRelay({key=process.env.RELAY_KEY||'',maxRooms=50}={}){
    const now=Date.now();if(now-ws.window>1000){ws.window=now;ws.frames=ws.bytes=0}
    if(binary||++ws.frames>120||(ws.bytes+=buffer.length)>8*1024*1024){ws.close(1008,'Rate limit');return}
    let m;try{m=JSON.parse(buffer)}catch{ws.close(1008,'Invalid JSON');return}
-   if(!m||m.protocol!==PROTOCOL){send(ws,{type:'error',error:'Both players need v0.4.5.'});ws.close(1008,'Version mismatch');return}
+   if(!m||m.protocol!==PROTOCOL){send(ws,{type:'error',error:'Both players need v0.4.8.'});ws.close(1008,'Version mismatch');return}
    if(m.type==='ping'){send(ws,{type:'pong'});return}
    if(m.type==='create'||m.type==='join'){
     if(ws.room){send(ws,{type:'error',error:'Already in a room'});return}

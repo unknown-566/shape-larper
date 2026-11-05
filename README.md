@@ -8,6 +8,12 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
+## v0.4.8: combat and economy balance
+
+Enemy HP now follows sector/loop/player count instead of penalizing upgrade choices. Reworked weak sacrifices, bounded stacked damage/fire rate/dash and projectile stats, removed useless capped/duplicate/healing offers, and added a useful exhausted-draft fallback. Co-op gets scaled enemy HP, orbs/aura for either pilot and consistent Adrenaline/contact damage. Endless shooter intervals and speeds are bounded. Capital Rounds uses run earnings; Liquid Armor costs 30 credits with an eight-second cooldown.
+
+See [the balance notes and validation limits](BALANCE.md). Both players and the optional relay need v0.4.8 (protocol048). No public relay is deployed; the release includes an updated deployment package.
+
 ## v0.4.7: bosses intercept straight-line escapes
 
 All eight bosses now recognize sustained movement in one direction and occasionally mark a lane ahead of that path. The amber warning shows the full beam width for 0.9 seconds, then fires at its locked position. Reverse, stop before the lane, dash or pulse to respond; the warning never tracks you after it appears. The counter has a 4–4.8 second cooldown, avoids existing laser attacks and charge/absorb animations, and targets either co-op pilot. Existing boss-specific patterns remain intact. Network protocol stays 045.
@@ -30,9 +36,9 @@ String tones are cached with a bounded 96-note cache; shaker percussion replaces
 
 - Upgrade points open the card menu automatically. The world eases into slow motion, then freezes once both pilots have received the menu. Either pilot can choose the single team upgrade; play resumes after both finish or defer. Card descriptions, stat previews and costs have separate areas. Hover lifts, tilts and highlights cards.
 - The player panel follows movement with a soft lag; its upgrade control and credit readout travel with it. The boss health bar springs toward the boss, appears in front of panel chrome, and moves below the boss when the player is above it. It remains on-screen. Desktop wave announcements use a compact top banner.
-- **Online · room code** adds outbound WebSocket relay transport alongside LAN. Both players must run v0.4.5. No public relay is bundled or running: deploy the included server, then enter its WSS address and access key in the game. The host creates a room; the second pilot enters its code.
+- **Online · room code** adds outbound WebSocket relay transport alongside LAN. Both players must run v0.4.8. No public relay is bundled or running: deploy the included server, then enter its WSS address and access key in the game. The host creates a room; the second pilot enters its code.
 
-**Deployment:** [Czech relay guide](relay/README.md), `render.yaml`, Dockerfile and the `ShapeLarper-Relay-v0.4.5.zip` release asset. The server was tested locally with browser and Electron clients, including room pairing and synchronized menus; cloud deployment and your school network still require verification. Outbound WSS avoids relying on incoming LAN connections, but a network can also block WSS or the hosting domain. Do not assume any transport works on every network.
+**Deployment:** [Czech relay guide](relay/README.md), `render.yaml`, Dockerfile and the `ShapeLarper-Relay-v0.4.8.zip` release asset. The server was tested locally with browser and Electron clients, including room pairing and synchronized menus; cloud deployment and your school network still require verification. Outbound WSS avoids relying on incoming LAN connections, but a network can also block WSS or the hosting domain. Do not assume any transport works on every network.
 
 ## v0.4.3: impact effects
 

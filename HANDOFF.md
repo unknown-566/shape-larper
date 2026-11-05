@@ -1,6 +1,12 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.7
+## Current implementation: v0.4.8
+
+Read BALANCE.md for detailed tuning and evidence. balance.js loads after progression.js and before boot.js; overrides card effects/descriptions, wraps every effect in capStats, provides canOffer with snapshot/finally restore and explicit bad-sacrifice guards. SUPPLY_CARD added last and excluded from normal/random pools; preview special-cases it to avoid paying credits, deal falls back to it when all cards exhausted. catalog replication includes it through UP. ST now includes economy keys. New tests balance.js, balance-runs.js (invulnerable pacing bot; NOT human difficulty measurement). Six seeded campaigns pass; old baseline bot comparison did not finish so do not claim a comparative win rate or speedup.
+
+HP/cadence no longer depend on picks/build. Co-op HP scales 1.35 normal/1.65 bosses; per-pellet .9^(multi-1), dash ring .6 damage. Pulse/chain/aura scale sqrt damage; aura tests either pilot once, orbs surround both. Guest Adrenaline uses shared timer; guest boss contact fixed. Caps and safe shooter interval/Endless speed prevent runaway stacking. Capital uses runCoins (gross earned) not saved wallet; insurance30/8s. Protocol bumped048, relay version0.4.8; both clients and deployed relay must update. No public deployment.
+
+## Previous implementation: v0.4.7
 
 boss-pressure.js loaded before boot.js adds bossPressure at the end of bossUpd. Per-pilot normalized movement continuity (dot>.96, hold1.15s), initial cooldown2.6s then4.8-.4*phase, no cutoffs during shield/intro/charge/absorb or existing LZ. Projects dominant movement axis1.04s ahead, locks a standard .9s warning/.35s beam into LZ with cutoff flag; existing shift/snapshot/pulse/collision paths handle it. Amber full-width warning rendering. NET.other now records authoritative normalized mvx/mvy; alternate eligible pilots. No new protocol required (045). tests/boss-pressure.js checks four cardinal + diagonal kiting with real wmShift/lzUpd, reversal safety, all eight bosses, guest target, locked serialization, shield/stationary suppression.
 

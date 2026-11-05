@@ -4,5 +4,5 @@ const assert=require('node:assert/strict'),path=require('node:path');const {path
  // Co-op shares one fixed arena even when the two displays differ.
  NET.connected=true;NET.role='host';NET.other={...P,x:800};desktopPre();desktopContain();const arena=entities.every(e=>e.x>=e.r&&e.x<=W-e.r&&e.y>=e.r&&e.y<=H-e.r);NET.connected=false;NET.role='';
  const before=JSON.stringify({U,P,WALLET});for(const c of UP)preview(c);const previews=JSON.stringify({U,P,WALLET})===before;
- WALLET.coins=30;U.insurance=1;const hp=P.hp;hurt();const insured=P.hp===hp&&WALLET.coins===15;P.inv=0;hurt();const cooldown=P.hp===hp-1;
+ WALLET.coins=60;U.insurance=1;const hp=P.hp;hurt();const insured=P.hp===hp&&WALLET.coins===30;P.inv=0;hurt();const cooldown=P.hp===hp-1;
  return{fits,arena,previews,insured,cooldown}});assert.ok(Object.values(result).every(Boolean),JSON.stringify({width,height,...result}));assert.deepEqual(errors,[]);await page.close();}console.log('PASS: enemies and bosses contained at 800p through 4K/portrait, co-op arena bounds, side-effect-free previews, insurance/cooldown');}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
