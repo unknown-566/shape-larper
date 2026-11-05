@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
     tags: ['v*']
-    paths: ['index.html', 'boot.js', 'desktop.js', 'menus.js', 'updates.js', 'effects.js', 'relay-client.js', 'relay/**', 'render.yaml', 'progression.js', 'multiplayer.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
+    paths: ['index.html', 'boot.js', 'soundtrack.js', 'desktop.js', 'menus.js', 'updates.js', 'effects.js', 'relay-client.js', 'relay/**', 'render.yaml', 'progression.js', 'multiplayer.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
 jobs:
   build:
     strategy:

@@ -8,6 +8,12 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
+## v0.4.6: original melodic soundtrack
+
+Four related tracks — Afterglow (menu), Neon Run (waves), No Way Back (bosses), Last Light (finale) — share an original eight-bar motif. Melody starts immediately even in quiet waves, with 32-bar arrangements, variations, choruses, breakdowns and drum turnarounds. Plucked-string textures and electric keys sit over syncopated bass and percussion. Paused/upgrade moments retain a softer melodic arrangement. No third-party recordings or copied melodies are included.
+
+String tones are cached with a bounded 96-note cache; shaker percussion replaces most oscillator-heavy hi-hats. Music Off still stops note scheduling. A 32-second WAV preview is included in the release. Network protocol remains 045, compatible with the v0.4.5 relay.
+
 ## v0.4.5: stable co-op arena and monitor selection
 
 - Desktop co-op uses one fixed, fully visible shared arena on both clients, including different monitor resolutions. Neither pilot moves the panel. Both pilots spawn together and can leave every screen edge.

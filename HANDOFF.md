@@ -1,6 +1,10 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.5
+## Current implementation: v0.4.6
+
+soundtrack.js loads before boot.js and populates SONGS; shared audio building blocks/mTick remain in index.html. Four original arrangements share eight-bar motif variants and a 32-bar form; melody is not gated by enemy count. stringNote uses deterministic Karplus-style cached buffers (96 maximum), electricKeys uses FM, shaker uses shared noise. No external media dependencies. Initial delay timing and cancelled pending song transitions corrected. tests/soundtrack.js renders all four complete forms through OfflineAudioContext and exports a 32-second wave preview, checking finite audio, peak/RMS, bounded cache and muted scheduling. Protocol remains045; no relay update needed.
+
+## Previous implementation: v0.4.5
 
 Co-op desktopLayout uses a fixed shared W×H arena fitted inside the available viewport, with header/footer margin. CX/CY use this panel center on both clients; solo retains soft following. tests/coop-movement.js uses real keyboard events for each pilot across 800×600 and 1920×1080 and tests leaving the bottom edge. It also catches startup page errors. boot.js is loaded LAST and starts scheduling only after every module loads; preserve this order in all builds.
 

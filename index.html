@@ -458,40 +458,7 @@ const mel=s=>s.trim().split(/\s+/).map(x=>x=='.'?null:x=='-'?'-':+x);
 const hk=a=>a.map(b=>{const m=mel(b),o=[];m.forEach((x,i)=>{if(typeof x=='number'){let l=1;while(m[i+l]=='-')l++;o.push([i,x,l])}});return o});
 const chordAt=(sg,b)=>{const [o,q]=sg.prog[b%sg.prog.length],r=sg.root+o;return{r,tn:q=='m'?[r,r+3,r+7]:[r,r+4,r+7]}};
 function playHook(H,base,b,s,t,sb,v=1,ins=lead){const bar=H[b%H.length],n=bar.find(q=>q[0]==s);if(!n)return;const pv=bar[bar.indexOf(n)-1];ins(t,base+n[1],n[2]*sb*.95,v,pv&&pv[0]+pv[2]==s?base+pv[1]:null)}
-const SONGS={
- // menu: slow, wide, a bell melody over a breathing pad
- menu:{bpm:84,root:57,prog:[[0,'m'],[-4,'M'],[3,'M'],[-2,'M']],
-  hook:hk(['12 - - - 10 - - - 7 - - - - - - -','8 - - - 7 - - - 5 - - - - - - -','7 - - - 3 - - - 0 - - - - - - -','2 - - - 5 - - - 7 - - - - - - -']),
-  play(b,s,t,sb,L,c){if(s==0)pad(t,c.tn.map(n=>n+12),sb*16,1);if(s%2==0){const k=[0,1,2,1,2,0,1,2][s/2];pluck(t,c.tn[k]+24,sb*1.6,.55,(s/2%2?.35:-.35))}
-   if(s==0)kick(t,.4);if(s==8)hat(t,.25,1);if((b>>2)%2)playHook(this.hook,69,b,s,t,sb,1,(t,n,d,v)=>bell(t,n,v))}},
- // waves: E minor, four on the floor, rolling sidechained bass, the hook comes in when it gets busy
- wave:{bpm:120,root:52,swing:.06,prog:[[0,'m'],[-4,'M'],[3,'M'],[-2,'M']],
-  hook:hk(['7 - - 5 7 - 10 - 12 - - - 10 - 7 -','3 - - - 2 - 0 - 3 - 7 - - - - -','7 - - 5 7 - 10 - 14 - - - 12 - 10 -','10 - - - 7 - - - 5 - - - 2 - - -']),
-  play(b,s,t,sb,L,c){if(s==0)pad(t,c.tn.map(n=>n+12),sb*16,L?.7:1.1);
-   if(L>=1){if(s%4==0)kick(t);if(s==4||s==12){snare(t,.8);clap(t,.55)}if(s%2==1)hat(t,s%4==3?.85:.45,0,.25);if(s==14)hat(t,.55,1,-.2);
-    if(s%4)bass(t,mf(c.r-12+(s%4==2?12:0)),sb*.85,s%4==2?.8:1,L>=3?1000:650);if(b%8==7&&s>=12)snare(t,.25+(s-12)*.15);if(b%8==0&&s==0&&L>=2)crash(t,.8)}
-   else if(s==0||s==8)kick(t,.55);
-   if(L>=2){const k=[0,1,2,3][s%4],n=(k==3?c.tn[0]+12:c.tn[k])+24;pluck(t,n,sb*.9,.75,s%2?.35:-.35)}
-   if(L>=3)playHook(this.hook,64,b,s,t,sb)}},
- // guardians: D minor with a harmonic-minor V, driving 16th bass, toms, a breakdown every fourth phrase
- boss:{bpm:140,root:50,prog:[[0,'m'],[-4,'M'],[5,'m'],[7,'M']],
-  hook:hk(['12 - 10 - 8 - 7 - 8 - 7 - 5 - 3 -','5 - - - 3 - 2 - 0 - - - 2 - 3 -','7 - - - 10 - 8 - 7 - 5 - 3 - 2 -','7 - - - 11 - - - 14 - - - 11 - - -']),
-  play(b,s,t,sb,L,c){const ph=(b>>2)%4,brk=ph==3;
-   if(s==0)pad(t,c.tn.map(n=>n+12),sb*16,brk?1.2:.6);
-   if(!brk){if(s%4==0||(s==10&&b%2))kick(t);if(s==4||s==12){snare(t,.9);clap(t,.6)}hat(t,s%2?.35:.7,s==6||s==14,s%2?.3:-.3);
-    bass(t,mf(c.r-12+(s%4==2?12:0)),sb*.8,s%4==0?1:.75,600+(b%4)*160+s*12);
-    if(b%4==3&&s>=12)tom(t,[190,160,130,100][s-12],.9);if(b%4==0&&s==0)crash(t,.9);if(ph>=1)playHook(this.hook,62,b,s,t,sb)}
-   else{if(s==0)kick(t,.7);if(b%4==3&&s==0)riser(t,sb*16,1);if(b%4==3&&s>=8)snare(t,.2+(s-8)*.09)}
-   if(s%2==0||brk){const k=[0,1,2,1][(s>>1)%4];pluck(t,c.tn[k]+24+(s>=8?12:0),sb*.9,brk?.9:.6,s%4?.4:-.4)}}},
- // the throne: C# minor with a Phrygian bII, choir pad, the fastest and heaviest
- final:{bpm:150,root:49,prog:[[0,'m'],[1,'M'],[-2,'M'],[7,'M']],
-  hook:hk(['0 - - - 1 - - - 0 - 7 - 8 - 7 -','8 - - - 5 - - - 1 - - - 5 - 8 -','10 - 7 - 5 - 2 - 5 - - - 7 - - -','7 - - - 11 - - - 14 - - - 12 - 11 -']),
-  play(b,s,t,sb,L,c){const ph=(b>>2)%4,brk=ph==3;
-   if(s==0)pad(t,[...c.tn.map(n=>n+12),c.tn[0]+24],sb*16,brk?1.3:.9);
-   if(!brk){if(s%4==0||s==14)kick(t,1.05);if(s==4||s==12)snare(t,1);if(s==12)clap(t,.7);hat(t,s%2?.4:.65,s%4==2,s%2?.3:-.3);
-    const bp=[0,0,12,0,0,12,0,7,0,0,12,0,7,0,12,10][s];bass(t,mf(c.r-12+bp),sb*.8,1,900+(b%4)*120);
-    if(b%4==3&&s>=12)tom(t,[200,170,140,110][s-12]);if(b%4==0&&s==0)crash(t,1);playHook(this.hook,61,b,s,t,sb);if(ph==2)playHook(this.hook,73,b,s,t,sb,.8,(t,n,d,v)=>bell(t,n,v))}
-   else{if(s==0||s==8)kick(t,.6);if(b%4==3&&s==0)riser(t,sb*16,1.2);if(b%4==3&&s>=8)snare(t,.25+(s-8)*.1);playHook(this.hook,73,b,s,t,sb,1,(t,n,d,v)=>bell(t,n,v))}}}};
+const SONGS={};
 const MS={k:null,next:null,cut:0,st:0,nt:0,L:1};
 const lvl=()=>S=='pick'||S=='pause'?0:!P?1:boss?3:(E.length+(spawnQ.length?2:0))>7||combo>10?3:E.length>2?2:1;
 function songStep(sg,st,t,L){const sb=60/sg.bpm/4,b=st>>4,s=st&15;sg.play(b,s,t+(sg.swing&&s%2?sb*sg.swing:0),sb,L,chordAt(sg,b))}
@@ -500,7 +467,8 @@ function mTick(){if(!AC||!MX)return;const n=AC.currentTime;MX.sfx.gain.setTarget
  MX.mus.gain.setTargetAtTime(.6*(CFG.mus??1)*(S=='pause'?.5:1),n,.15);
  MX.lp.frequency.setTargetAtTime(S=='pause'?900:HURTT>n?650:20000,n,S=='pause'?.1:.06);
  if(!(CFG.mus??1)){MS.nt=n+.05;return}
- if(!MS.k){MS.k=want;MS.st=0;MS.nt=n+.06}
+ if(!MS.k){MS.k=want;MS.st=0;MS.nt=n+.06;const bt=60/SONGS[want].bpm;MX.dL.delayTime.value=MX.dR.delayTime.value=bt*.75}
+ if(want===MS.k){MS.next=null;MS.cut=0}
  if(want!=MS.k&&MS.next!=want){MS.next=want;MS.cut=want=='boss'||want=='final'}
  if(MS.nt<n-.25)MS.nt=n+.05;
  while(MS.nt<n+.2){if(MS.next&&(MS.st%16==0||MS.cut)){MS.k=MS.next;MS.next=null;MS.st=0;const bt=60/SONGS[MS.k].bpm;MX.dL.delayTime.value=MX.dR.delayTime.value=bt*.75;
@@ -589,7 +557,7 @@ function wmBounds(){if(!WM||!P||NET.connected){BX0=0;BX1=W;BY0=0;BY1=H;QX0=QY0=-
  BX0=P.x+(s.x-CX)/WSC;BX1=P.x+(s.x+s.w-CX)/WSC;BY0=P.y+(s.y-CY)/WSC;BY1=P.y+(s.y+s.h-CY)/WSC;QX0=Math.min(-30,BX0-40);QX1=Math.max(W+30,BX1+40);QY0=Math.min(-30,BY0-40);QY1=Math.max(H+30,BY1+40)}
 
 /* v0.3: version, advancements, new enemies, living windows */
-const VER='0.4.5';
+const VER='0.4.6';
 
 /* advancements: unlocked once, saved between runs, announced with a toast */
 const ADV=[
@@ -838,4 +806,5 @@ function statusDraw(){g.fillStyle='#07060f';g.fillRect(0,0,W,H);T('SHAPE LARPER'
  btn(S=='pause'?'Resume':'Pause',W/2-130,330,260,46,()=>{S=S=='pause'?'play':S=='play'?'pause':S});btn('End run',W/2-130,390,260,46,toMenu)}
 addEventListener('pagehide',wmStop);
 
-</script><script src="desktop.js"></script><script src="updates.js"></script><script src="menus.js"></script><script src="multiplayer.js"></script><script src="progression.js"></script><script src="effects.js"></script><script src="relay-client.js"></script><script src="boot.js"></script></body></html>
+</script><script src="desktop.js"></script><script src="updates.js"></script><script src="menus.js"></script><script src="multiplayer.js"></script><script src="progression.js"></script><script src="effects.js"></script><script src="relay-client.js"></script><script src="soundtrack.js"></script>
+<script src="boot.js"></script></body></html>
