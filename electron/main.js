@@ -4,6 +4,11 @@ const path=require('path');
 const {shell}=require('electron');
 const {createUpdateService}=require('./updater');
 let updates=null;
+const {createLan}=require('./lan');
+const lan=createLan({notify:event=>{if(main&&!main.isDestroyed())main.webContents.send('sl:lan',event)}});
+ipcMain.handle('sl:lan',async(event,action,value)=>{if(!trusted(event))return;try{if(['discover','host','join','leave'].includes(action)){await lan[action](value);return {ok:true}}}catch(e){return {error:e.message}}});
+ipcMain.on('sl:lan-send',(event,message)=>{if(trusted(event))lan.send(message)});
+ipcMain.handle('sl:clear-desktop',async event=>{if(!trusted(event)||process.platform!=='win32')return false;return new Promise(resolve=>{require('node:child_process').execFile('powershell.exe',['-NoProfile','-NonInteractive','-Command','(New-Object -ComObject Shell.Application).MinimizeAll()'],{windowsHide:true,timeout:5000},error=>{if(main&&!main.isDestroyed()){main.restore();main.show();main.focus()}resolve(!error)})})});
 let main=null,desktop=false,menuBounds=null,displayId=null;
 function menuRect(area){const width=Math.min(960,area.width),height=Math.min(640,area.height);return{x:area.x+Math.round((area.width-width)/2),y:area.y+Math.round((area.height-height)/2),width,height}}
 function createMain(){
@@ -34,5 +39,5 @@ ipcMain.handle('sl:update-install',event=>trusted(event)?updates?.install():fals
 ipcMain.on('sl:update-installer',event=>{if(trusted(event))shell.openExternal('https://github.com/unknown-566/shape-larper/releases/latest')});
 function displayChanged(){if(!desktop||!main)return;const display=screen.getAllDisplays().find(d=>d.id===displayId)||screen.getDisplayMatching(main.getBounds());displayId=display.id;main.setBounds(display.workArea,false)}
 app.whenReady().then(()=>{createMain();updates=createUpdateService({app,notify:state=>{if(main&&!main.isDestroyed())main.webContents.send('sl:update',state)}});screen.on('display-metrics-changed',displayChanged);screen.on('display-removed',displayChanged)});
-app.on('before-quit',()=>updates?.dispose());
+app.on('before-quit',()=>{updates?.dispose();lan.leave()});
 app.on('window-all-closed',()=>app.quit());

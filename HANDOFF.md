@@ -1,6 +1,14 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.1
+## Current implementation: v0.4.2
+
+LAN: electron/lan.js implements UDP discovery and bounded TCP frames (port 43871, protocol shape-larper-042). multiplayer.js handles two-player host-authoritative simulation and 30 Hz snapshots. Shared hull/pulse/upgrades; host resumes and chooses. Guest does not simulate. Run IDs reset reward checkpoints on retry. Only run-earned advancements replicate. Desktop co-op uses a common fixed arena; solo keeps scrolling. Disconnect ends the session; no host migration or reconnect-in-progress.
+
+progression.js owns ng_wallet, six cosmetics, four economic upgrades, banked picks, animated cards and vector icons. New U fields must be in U0 so previews restore them. advance() banks a pick and starts the next wave; choose() MUST NOT call begin(). Deferred cards keep their options. Practice awards no credits.
+
+Desktop containment clamps simulation positions as well as panels. Tests: panel-boundaries.js (five resolutions, whole entities inside panels, preview/insurance invariants); coop-progression.js (real TCP between browser renderers); native-coop.js (two actual apps, preload, desktop co-op, pause, retry reward reset); lan-discovery.js (UDP and protocol rejection). fullrun2.js now opens banked picks and asserts final-boss completion. Existing overlay, performance and updater tests remain applicable.
+
+Minimize-other-windows defaults on for Windows run launches, using a fixed Shell.Application.MinimizeAll command in hidden PowerShell. Set CFG.clearDesktop=false in automated UI tests to avoid affecting the user's windows.
 
 Desktop mode now uses one transparent BrowserWindow and one clipped world draw (`desktop.js`), rather than native windows per entity. `menus.js` owns adaptive settings and pause UI. The older architecture below is retained as historical context.
 

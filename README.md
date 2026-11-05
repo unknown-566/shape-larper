@@ -8,6 +8,21 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
+## v0.4.2: LAN co-op, credits and the hangar
+
+Open **LAN co-op** on two desktop copies of v0.4.2 on the same network. One player chooses **Host game**; the other selects the automatically discovered lobby. **Join by IP** works when broadcasts are filtered. Allow the game on private networks in Windows Firewall (UDP discovery and TCP gameplay, port 43871). No internet matchmaking or port forwarding is needed.
+
+Two pilots share hull, pulse charge and team upgrades. The host runs the simulation and controls resume and upgrade choices; either pilot can request pause or upgrades. Each receives earned credits and advancements in their own save. Desktop co-op uses a common fixed arena across display sizes. A disconnect ends the session; host a new lobby to reconnect.
+
+- **Credits:** enemy kills, bosses, wave clears and clean-wave bonuses. Practice pays nothing. Credits survive death.
+- **Hangar:** six cosmetic hulls, unlocked with credits and the listed advancement. They change ship color and silhouette.
+- **Economic upgrades:** Bounty Hunter increases kill payouts; Compound Interest pays extra on clears; Liquid Armor spends 15 host credits to block a hit, with a five-second cooldown; Capital Rounds scales damage with the host's saved credits, capped at +30%.
+- **Banked upgrades:** clears grant picks without stopping play. Click **UPGRADES** or press **U**. Animated cards can be deferred with **U**, **Escape**, or **Keep for later**, without rerolling. Choosing never restarts the wave.
+- **Desktop:** enemies and bosses stop at visible panel/screen boundaries. Starting a run minimizes other windows on Windows; this can be disabled in Settings.
+- Canvas vector insignia replace platform emoji in upgrades, advancements and menus.
+
+New persistent data uses localStorage `ng_wallet`; previous saves are retained. Reset progress also resets credits and skins.
+
 ## Performance
 
 Settings → Graphics offers **auto**, **low**, and **high**. Auto starts in low quality on CPUs reporting four or fewer logical processors, and switches to low after sustained slow frames. Low reduces decorative effects, particles and HiDPI rendering. Enemy counts, bullets and damage stay the same.

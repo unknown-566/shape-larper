@@ -29,6 +29,6 @@ function updateSettings(){
 }
 function updateBanner(){
  if(!UPDATE_API||UPDATE_STATE.phase!=='ready')return;
- menuPanel(526,470,370,100);T('UPDATE READY',548,490,12,'#8ff5f2','left');
- btn('Restart & install v'+UPDATE_STATE.version,546,512,330,38,updateAction,{sz:16,c:'#b4fff8'});
+ menuPanel(526,300,370,100);T('UPDATE READY',548,320,12,'#8ff5f2','left');
+ btn('Restart & install v'+UPDATE_STATE.version,546,342,330,38,updateAction,{sz:16,c:'#b4fff8'});
 }

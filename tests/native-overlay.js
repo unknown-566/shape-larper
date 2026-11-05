@@ -8,7 +8,7 @@ const {_electron}=require('playwright');
   // Do not take focus from the user while automating a desktop-sized surface.
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.prototype.focus=()=>{};BrowserWindow.prototype.show=function(){this.showInactive()}});
   const menu=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].getBounds());
-  await page.evaluate(async()=>{kd=()=>{};md=()=>{};CFG.vol=CFG.mus=0;CFG.wm=1;CFG.quality='low';await desktopStart(()=>{newGame();P.hp=P.mhp=99;P.inv=999;spawnQ=[];for(let i=0;i<24;i++)spawn(i%10,30+i%8*120,80+Math.floor(i/8)*170);startBoss();boss.x=700;boss.y=220;boss.intro=0});S='pause'});
+  await page.evaluate(async()=>{kd=()=>{};md=()=>{};CFG.clearDesktop=false;CFG.vol=CFG.mus=0;CFG.wm=1;CFG.quality='low';await desktopStart(()=>{newGame();P.hp=P.mhp=99;P.inv=999;spawnQ=[];for(let i=0;i<24;i++)spawn(i%10,30+i%8*120,80+Math.floor(i/8)*170);startBoss();boss.x=700;boss.y=220;boss.intro=0});S='pause'});
   await page.waitForTimeout(500);
   const native=await app.evaluate(({BrowserWindow,screen})=>{const windows=BrowserWindow.getAllWindows();const w=windows[0];return{count:windows.length,bounds:w.getBounds(),workArea:screen.getDisplayMatching(w.getBounds()).workArea,background:w.getBackgroundColor(),visible:w.isVisible()}});
   assert.equal(native.count,1);assert.deepEqual(native.bounds,native.workArea);assert.ok(native.visible);assert.equal(native.background,'#000000');

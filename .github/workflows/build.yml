@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
     tags: ['v*']
-    paths: ['index.html', 'desktop.js', 'menus.js', 'updates.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
+    paths: ['index.html', 'desktop.js', 'menus.js', 'updates.js', 'progression.js', 'multiplayer.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
 jobs:
   build:
     strategy:

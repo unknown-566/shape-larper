@@ -8,6 +8,7 @@ function desktopLayout(){
  const panelScale=cl(Math.min(width/1440,height/900),.35,2)*(CFG.panelScale||1);
  const playerWidth=Math.min(width-24,768*panelScale),playerHeight=Math.min(height-110,512*panelScale);
  const player={kind:'p',x:(width-playerWidth)/2,y:cl(height*.56-playerHeight/2,78,height-playerHeight-16),w:playerWidth,h:playerHeight};
+ if(NET.connected&&P){const z=cl(Math.min(width/W,height/H)*.9,.3,4);player.x=cl(width/2+(P.x-W/2)*z-playerWidth/2,12,width-playerWidth-12);player.y=cl(height/2+(P.y-H/2)*z-playerHeight/2,78,height-playerHeight-16)}
  const uiScale=Math.min(width/1008,height/688)*(CFG.uiScale||1);
  // A larger interface still fits: crop-free menus take precedence over magnification.
  const ui=Math.min(uiScale,(width-24)/W,(height-24)/H);
@@ -30,11 +31,25 @@ function desktopStop(){
  SL.desktop(false).then(()=>{fit();desktopNeedsPresent=true;sched(window)}).catch(console.error);
  wmBounds();
 }
+function desktopCamera(){return NET.connected?{x:W/2,y:H/2}:P}
 function desktopPre(){
- const layout=desktopLayout();CX=layout.player.x+layout.player.w/2;CY=layout.player.y+layout.player.h/2;
+ const layout=desktopLayout();CX=layout.player.x+layout.player.w/2;CY=layout.player.y+layout.player.h/2;if(NET.connected){CX=innerWidth/2;CY=innerHeight/2}
  // Scale the world with available height, preserving the same combat distances.
  WSC=cl(Math.min(innerWidth/W,innerHeight/H)*.9,.3,4);
- if(desktopPointer.seen&&P){M.x=P.x+(desktopPointer.x-CX)/WSC;M.y=P.y+(desktopPointer.y-CY)/WSC}
+ if(desktopPointer.seen&&P){M.x=desktopCamera().x+(desktopPointer.x-CX)/WSC;M.y=desktopCamera().y+(desktopPointer.y-CY)/WSC}
+}
+// A clamped panel must never conceal its own enemy. Clamp the simulation too,
+// using world coordinates derived from this monitor's actual canvas transform.
+function desktopContain(){
+ if(!DESKTOPMODE||!P||NET.role==='guest')return;
+ desktopPre();
+ for(const e of [...E,...(boss?[boss]:[])]){
+  const margin=(e.r||16)+8;if(NET.connected){e.x=cl(e.x,margin,W-margin);e.y=cl(e.y,margin,H-margin);continue}
+  const minX=P.x+(8-CX)/WSC+margin,maxX=P.x+(innerWidth-8-CX)/WSC-margin;
+  const minY=P.y+((e===boss?80:8)-CY)/WSC+margin,maxY=P.y+(innerHeight-8-CY)/WSC-margin;
+  if(minX<=maxX)e.x=cl(e.x,minX,maxX);
+  if(minY<=maxY)e.y=cl(e.y,minY,maxY);
+ }
 }
 function desktopMouse(e){
  const layout=desktopLayout();desktopPointer={x:e.clientX,y:e.clientY,seen:true};
@@ -43,13 +58,13 @@ function desktopMouse(e){
 }
 function desktopPanels(layout){
  const {width,height,panelScale,player}=layout,panels=[];
- const screenPoint=e=>({x:CX+(e.x-P.x)*WSC,y:CY+(e.y-P.y)*WSC});
+ const screenPoint=e=>({x:CX+(e.x-desktopCamera().x)*WSC,y:CY+(e.y-desktopCamera().y)*WSC});
  const insidePlayer=c=>c.x>player.x+12&&c.x<player.x+player.w-12&&c.y>player.y+12&&c.y<player.y+player.h-12;
  const size=200*panelScale;
  // Cluster only nearby screen positions. Stable world positions never get
  // recentered to a clamped panel: that was the source of false bullet locations.
  const clusters=[];
- for(const e of E){if(e.dead)continue;const c=screenPoint(e);if(insidePlayer(c))continue;
+ for(const e of [...E,...(NET.connected&&NET.other?[{...NET.other,k:0,c:SKINS.find(s=>s[0]===NET.skin)?.[2]||'#8feaff',r:15,hp:P.hp,mhp:P.mhp,friend:true}]:[])]){if(e.dead)continue;const c=screenPoint(e);if(insidePlayer(c))continue;
   if(c.x<-size/2||c.y<-size/2||c.x>width+size/2||c.y>height+size/2)continue;
   const q=clusters.find(q=>q.es.length<5&&Math.abs(q.x-c.x)<size*.32&&Math.abs(q.y-c.y)<size*.32);
   if(q){q.es.push(e);q.x+=(c.x-q.x)/q.es.length;q.y+=(c.y-q.y)/q.es.length}else clusters.push({x:c.x,y:c.y,es:[e]});
@@ -73,23 +88,23 @@ function desktopHud(panel,layout){
  g.fillStyle='#b06cff';g.fillRect(104,height-28,76*cl(pulse,0,1),5);
  T('DASH',12,height-12,10,'#a5b0d1','left');T(P.pc>=100?'PULSE · Q':'PULSE',104,height-12,10,'#a5b0d1','left');
  const items=Object.values(own).slice(-4),space=width-306;
- if(space>32){const step=Math.min(25,space/Math.max(1,items.length));items.forEach((o,i)=>T(o.i+(o.n>1?'×'+o.n:''),200+i*step,height-20,14,'#e6ddff'))}
+ if(space>32){const step=Math.min(25,space/Math.max(1,items.length));items.forEach((o,i)=>icon(o.i,200+i*step,height-20,9,'#e6ddff'))}
  T('ESC · PAUSE',width-12,height-16,10,'#9d96bb','right');
  g.restore();
 }
 function desktopRender(){
  const layout=desktopLayout();g=g0;CW=1;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.setTransform(DK,0,0,DK,0,0);
- desktopPre();desktopRects=desktopPanels(layout);
+ desktopPre();desktopContain();desktopRects=desktopPanels(layout);
  // All panels share this single world draw. The transparent gaps are outside
  // the clipping region, so neither background nor bullets are painted there.
  g.save();g.beginPath();for(const r of desktopRects)g.rect(r.x,r.y,r.w,r.h);g.clip();
- g.translate(CX-P.x*WSC,CY-P.y*WSC);g.scale(WSC,WSC);
- VW={x0:P.x-CX/WSC,y0:P.y-CY/WSC,x1:P.x+(layout.width-CX)/WSC,y1:P.y+(layout.height-CY)/WSC};
+ g.translate(CX-desktopCamera().x*WSC,CY-desktopCamera().y*WSC);g.scale(WSC,WSC);
+ VW={x0:desktopCamera().x-CX/WSC,y0:desktopCamera().y-CY/WSC,x1:desktopCamera().x+(layout.width-CX)/WSC,y1:desktopCamera().y+(layout.height-CY)/WSC};
  drawWorld();xhair();VW=null;g.restore();
  for(const r of desktopRects){
   if(r.kind=='p')continue;
   g.save();g.beginPath();g.rect(r.x,r.y,r.w,r.h);g.clip();g.translate(r.x,r.y);g.scale(layout.panelScale,layout.panelScale);
-  wmFrame(r,r.w/layout.panelScale,r.h/layout.panelScale);g.restore();
+  if(r.e?.friend){g.strokeStyle=r.e.c;g.lineWidth=2;g.strokeRect(1,1,r.w/layout.panelScale-2,r.h/layout.panelScale-2);T('CO-PILOT',12,18,12,r.e.c,'left')}else wmFrame(r,r.w/layout.panelScale,r.h/layout.panelScale);g.restore();
  }
  const player=layout.player;
  g.strokeStyle='#5ef2ff88';g.lineWidth=2;g.strokeRect(player.x+1,player.y+1,player.w-2,player.h-2);
@@ -98,7 +113,7 @@ function desktopRender(){
  if(flash>0&&CFG.fl){g.save();g.beginPath();for(const r of desktopRects)g.rect(r.x,r.y,r.w,r.h);g.clip();g.fillStyle=`rgba(${FLC},${flash*.35})`;g.fillRect(0,0,layout.width,layout.height);g.restore()}
  if(S!='play'){g.fillStyle='#04030ab8';g.fillRect(0,0,layout.width,layout.height)}
  g.save();g.translate(layout.ux,layout.uy);g.scale(layout.ui,layout.ui);
- if(S=='play'){banDraw();toastDraw()}else{overlays();toastDraw();tipDraw()}
+ if(S=='play'){banDraw();toastDraw();progressHud()}else{overlays();toastDraw();tipDraw()}
  g.restore();document.documentElement.classList.toggle('desktop-playing',S=='play');
  if(desktopNeedsPresent){desktopNeedsPresent=false;SL.present()}
 }

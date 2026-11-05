@@ -21,9 +21,10 @@ function settingsDraw(){
  T('LAYOUT',76,392,12,'#5ef2ff','left');T('Fits your display automatically',884,392,12,'#938aa9','right','normal');
  btn('Panel size  ·  '+Math.round((CFG.panelScale||1)*100)+'%',72,414,380,46,()=>settingCycle('panelScale',[.85,1,1.15]),{sz:17});
  btn('Interface size  ·  '+Math.round((CFG.uiScale||1)*100)+'%',508,414,380,46,()=>settingCycle('uiScale',[.85,1,1.15]),{sz:17});
+ if(NAT)btn('Minimize other windows · '+(CFG.clearDesktop!==false?'On':'Off'),508,470,380,30,()=>{CFG.clearDesktop=CFG.clearDesktop===false;saveD()},{sz:13});
  T(DESKTOPMODE?Math.round(innerWidth)+' × '+Math.round(innerHeight)+' · Desktop':CFG.wm?'Desktop layout · adaptive':'Classic · 960 × 640 arena',76,UPDATE_API?477:496,13,'#b1a6cc','left','normal');
  updateSettings();
- if(SETTINGS_RETURN=='title')btn(cf?'Confirm reset':'Reset progress',666,516,222,40,()=>{if(!cf){cf=1;return}SEEN={};ADVS={};hi=0;localStorage.removeItem('ng_adv');localStorage.removeItem('ng_hi');cf=0;saveD()},{c:'#ff849c',sz:15});
+ if(SETTINGS_RETURN=='title')btn(cf?'Confirm reset':'Reset progress',666,516,222,40,()=>{if(!cf){cf=1;return}SEEN={};ADVS={};hi=0;WALLET={coins:0,earned:0,skins:['signal'],skin:'signal'};walletSave();localStorage.removeItem('ng_adv');localStorage.removeItem('ng_hi');cf=0;saveD()},{c:'#ff849c',sz:15});
  else T('Your changes are saved immediately.',76,UPDATE_API?574:548,13,'#9288a9','left','normal');
  T('ESC · BACK',64,612,12,'#827696','left','normal');T('v'+VER,896,612,12,'#827696','right','normal');
 }
@@ -31,8 +32,9 @@ function pauseDraw(){
  if(!DESKTOPMODE)dim(.72);
  menuPanel(264,112,432,NAT?444:392);
  T('PAUSED',W/2,164,38,'#f5efff');
- T('Score '+score+'   ·   '+fmtT(RT),W/2,209,15,'#ada3c6','center','normal');
- btn('Resume',300,252,360,48,resumeGame,{c:'#8ff5f2',sz:20});
+ if(pendingPicks&&NET.role!=='guest')btn('Choose upgrade · '+pendingPicks,300,213,360,30,openPicks,{sz:14});
+ T('Score '+score+'   ·   '+fmtT(RT),W/2,197,15,'#ada3c6','center','normal');
+ btn(NET.role==='guest'?'Waiting for host':'Resume',300,252,360,48,()=>{if(NET.role!=='guest')resumeGame()},{c:'#8ff5f2',sz:20});
  btn('Settings',300,312,360,48,()=>openSettings('pause'),{sz:19});
  btn('Return to menu',300,372,360,48,toMenu,{sz:19});
  if(NAT)btn('Quit game',300,432,360,44,()=>SL.quit(),{c:'#ff87a7',sz:17});
