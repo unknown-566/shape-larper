@@ -1,5 +1,13 @@
 # Shape Larper: handoff
 
+## Current implementation: v0.4.1
+
+Desktop mode now uses one transparent BrowserWindow and one clipped world draw (`desktop.js`), rather than native windows per entity. `menus.js` owns adaptive settings and pause UI. The older architecture below is retained as historical context.
+
+Windows builds now use electron-builder (NSIS + ZIP). `electron/updater.js` uses electron-updater for installed Windows copies: a check 5 seconds after launch and every 4 hours, automatic background download, SHA-512 verification, and explicit Restart & update. Never enable install-on-quit or interrupt runs. Preferences are stored in userData/updates.json; saves use the same userData directory as v0.4.0. Portable/unpackaged/non-Windows copies show an installer link instead of self-replacing. `updates.js` exposes status and actions in settings and an update-ready banner in the title menu.
+
+Publish the Setup EXE, its blockmap, latest.yml and portable ZIP together on a versioned GitHub release, marking the version tag as latest. Do not recreate a separate `latest` tag release: updater clients need the semantic version and metadata on the newest release. `npm run build:win` writes all four assets to dist/. Preserve installer names referenced by latest.yml. Tests: updater.js (state machine), updater-network.js (real NsisUpdater with local fixtures, checksum rejection and downgrade prevention), updater-ui.js, native-overlay.js, desktop-overlay.js and performance.js.
+
 State at v0.3.3 (branch `main`, also mirrored on `claude/festive-thompson-65no8r`).
 
 ## What it is

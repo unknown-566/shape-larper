@@ -591,7 +591,7 @@ function wmBounds(){if(!WM||!P){BX0=0;BX1=W;BY0=0;BY1=H;QX0=QY0=-30;QX1=W+30;QY1
  BX0=P.x+(s.x-CX)/WSC;BX1=P.x+(s.x+s.w-CX)/WSC;BY0=P.y+(s.y-CY)/WSC;BY1=P.y+(s.y+s.h-CY)/WSC;QX0=Math.min(-30,BX0-40);QX1=Math.max(W+30,BX1+40);QY0=Math.min(-30,BY0-40);QY1=Math.max(H+30,BY1+40)}
 
 /* v0.3: version, advancements, new enemies, living windows */
-const VER='0.4.0';
+const VER='0.4.1';
 
 /* advancements: unlocked once, saved between runs, announced with a toast */
 const ADV=[
@@ -709,6 +709,7 @@ function titleMenu(){menuBG();titleDraw();
  MMOV=0;if(MSEL!==MSELP){if(MSELP>=0&&AC)sfx('ui');MSELP=MSEL}
  const na=ADV.filter(a=>ADVS[a[0]]).length;g.fillStyle='rgba(8,4,20,.6)';g.fillRect(58,532,320,44);g.strokeStyle='rgba(140,120,220,.35)';g.lineWidth=1;g.strokeRect(58,532,320,44);
  T('BEST',74,546,10,'#9a90d0','left');T(String(hi),74,563,16,'#fff','left');T('THRONE',170,546,10,'#9a90d0','left');T('×'+(SEEN.win||0),170,563,16,'#ffd24a','left');T('ADVANCEMENTS',260,546,10,'#9a90d0','left');T(na+' / '+ADV.length,260,563,16,'#5ef2ff','left');
+ if(NAT&&typeof updateBanner==='function')updateBanner();
  if(CFG.wm)T(window.SL?'Desktop mode: synchronized panels on a transparent desktop canvas.':'Windows mode: pop-ups must be allowed. Desktop Chrome or Edge.',58,594,12,'#ffb84f','left','normal');
  T('WASD move · Mouse aim · Hold click fire · Space dash · Q pulse · ↑↓ + Enter menu',58,616,12,'#8a84b8','left','normal')}
 function menuKey(e){if(S!='title')return 0;const n=MITEMS.length||7;
@@ -838,4 +839,4 @@ function statusDraw(){g.fillStyle='#07060f';g.fillRect(0,0,W,H);T('SHAPE LARPER'
  btn(S=='pause'?'Resume':'Pause',W/2-130,330,260,46,()=>{S=S=='pause'?'play':S=='play'?'pause':S});btn('End run',W/2-130,390,260,46,toMenu)}
 addEventListener('pagehide',wmStop);
 sched(window);setInterval(()=>{if(performance.now()-LL>300)sched(window)},250);
-</script><script src="desktop.js"></script><script src="menus.js"></script></body></html>
+</script><script src="desktop.js"></script><script src="updates.js"></script><script src="menus.js"></script></body></html>

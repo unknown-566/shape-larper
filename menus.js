@@ -21,9 +21,10 @@ function settingsDraw(){
  T('LAYOUT',76,392,12,'#5ef2ff','left');T('Fits your display automatically',884,392,12,'#938aa9','right','normal');
  btn('Panel size  ·  '+Math.round((CFG.panelScale||1)*100)+'%',72,414,380,46,()=>settingCycle('panelScale',[.85,1,1.15]),{sz:17});
  btn('Interface size  ·  '+Math.round((CFG.uiScale||1)*100)+'%',508,414,380,46,()=>settingCycle('uiScale',[.85,1,1.15]),{sz:17});
- T(DESKTOPMODE?Math.round(innerWidth)+' × '+Math.round(innerHeight)+' · Desktop':CFG.wm?'Desktop layout · adaptive':'Classic · 960 × 640 arena',76,496,13,'#b1a6cc','left','normal');
+ T(DESKTOPMODE?Math.round(innerWidth)+' × '+Math.round(innerHeight)+' · Desktop':CFG.wm?'Desktop layout · adaptive':'Classic · 960 × 640 arena',76,UPDATE_API?477:496,13,'#b1a6cc','left','normal');
+ updateSettings();
  if(SETTINGS_RETURN=='title')btn(cf?'Confirm reset':'Reset progress',666,516,222,40,()=>{if(!cf){cf=1;return}SEEN={};ADVS={};hi=0;localStorage.removeItem('ng_adv');localStorage.removeItem('ng_hi');cf=0;saveD()},{c:'#ff849c',sz:15});
- else T('Your changes are saved immediately.',76,548,13,'#9288a9','left','normal');
+ else T('Your changes are saved immediately.',76,UPDATE_API?574:548,13,'#9288a9','left','normal');
  T('ESC · BACK',64,612,12,'#827696','left','normal');T('v'+VER,896,612,12,'#827696','right','normal');
 }
 function pauseDraw(){

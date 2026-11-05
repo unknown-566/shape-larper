@@ -1,18 +1,66 @@
 {
   "name": "shape-larper",
   "productName": "Shape Larper",
-  "version": "0.4.0",
-  "description": "Bullet hell arcade where every enemy lives in its own window",
+  "version": "0.4.1",
+  "description": "Bullet hell roguelite with synchronized transparent desktop panels",
   "main": "electron/main.js",
   "private": true,
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-packager . \"Shape Larper\" --platform=win32 --arch=x64 --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\"",
+    "build:win": "electron-builder --win nsis zip --x64 --publish never",
     "build:mac": "electron-packager . \"Shape Larper\" --platform=darwin --arch=universal --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\"",
     "build:linux": "electron-packager . \"Shape Larper\" --platform=linux --arch=x64 --out=dist --overwrite --asar --ignore=\"^/dist\" --ignore=\"^/\\.github\" --ignore=\"^/node_modules\" --ignore=\"^/\\.gitignore\""
   },
   "devDependencies": {
     "@electron/packager": "20.3.0",
-    "electron": "44.9.2"
+    "electron": "44.9.2",
+    "electron-builder": "26.18.0"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unknown-566/shape-larper.git"
+  },
+  "author": "unknown-566",
+  "build": {
+    "appId": "com.unknown566.shapelarper",
+    "productName": "Shape Larper",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "desktop.js",
+      "menus.js",
+      "updates.js",
+      "electron/**/*",
+      "package.json"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "unknown-566",
+        "repo": "shape-larper",
+        "releaseType": "release"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "artifactName": "ShapeLarper-v${version}-win-${arch}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "artifactName": "ShapeLarper-Setup-v${version}-win-${arch}.${ext}",
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true
+    }
   }
 }

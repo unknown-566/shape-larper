@@ -1,6 +1,9 @@
 // One transparent native surface. Every game panel is composed by the same canvas.
 const {app,BrowserWindow,ipcMain,screen}=require('electron');
 const path=require('path');
+const {shell}=require('electron');
+const {createUpdateService}=require('./updater');
+let updates=null;
 let main=null,desktop=false,menuBounds=null,displayId=null;
 function menuRect(area){const width=Math.min(960,area.width),height=Math.min(640,area.height);return{x:area.x+Math.round((area.width-width)/2),y:area.y+Math.round((area.height-height)/2),width,height}}
 function createMain(){
@@ -24,6 +27,12 @@ ipcMain.handle('sl:desktop',(event,enabled)=>{
 ipcMain.on('sl:present',event=>{if(trusted(event)&&!main.isVisible()){main.show();main.focus()}});
 ipcMain.on('sl:minimize',event=>{if(trusted(event))main.minimize()});
 ipcMain.on('sl:quit',event=>{if(trusted(event))app.quit()});
+ipcMain.handle('sl:update-state',event=>trusted(event)?updates?.getState():null);
+ipcMain.handle('sl:update-check',event=>trusted(event)?updates?.check():null);
+ipcMain.handle('sl:update-auto',(event,value)=>trusted(event)?updates?.setAutomatic(value):null);
+ipcMain.handle('sl:update-install',event=>trusted(event)?updates?.install():false);
+ipcMain.on('sl:update-installer',event=>{if(trusted(event))shell.openExternal('https://github.com/unknown-566/shape-larper/releases/latest')});
 function displayChanged(){if(!desktop||!main)return;const display=screen.getAllDisplays().find(d=>d.id===displayId)||screen.getDisplayMatching(main.getBounds());displayId=display.id;main.setBounds(display.workArea,false)}
-app.whenReady().then(()=>{createMain();screen.on('display-metrics-changed',displayChanged);screen.on('display-removed',displayChanged)});
+app.whenReady().then(()=>{createMain();updates=createUpdateService({app,notify:state=>{if(main&&!main.isDestroyed())main.webContents.send('sl:update',state)}});screen.on('display-metrics-changed',displayChanged);screen.on('display-removed',displayChanged)});
+app.on('before-quit',()=>updates?.dispose());
 app.on('window-all-closed',()=>app.quit());

@@ -7,7 +7,7 @@ class Window{
  setMenu(){} once(){} on(){} loadFile(){} getBounds(){return {...this.bounds}} setBounds(b){this.bounds={...b}} hide(){this.visible=false} show(){this.visible=true} focus(){} isDestroyed(){return false} isVisible(){return this.visible} minimize(){this.minimized=true}
 }
 const electron={BrowserWindow:Window,app:{whenReady:()=>({then:fn=>fn()}),on:(key,fn)=>events[key]=fn,getVersion:()=> '0.4.0',quit:()=>{}},screen:{getDisplayNearestPoint:()=>display,getCursorScreenPoint:()=>({x:0,y:0}),getDisplayMatching:()=>display,getAllDisplays:()=>[display],on:(key,fn)=>screenEvents[key]=fn},ipcMain:{handle:(key,fn)=>handlers[key]=fn,on:(key,fn)=>handlers[key]=fn}};
-const context=vm.createContext({require:key=>key==='electron'?electron:require(key),__dirname:path.resolve(__dirname,'../electron')});
+const context=vm.createContext({require:key=>key==='electron'?electron:key==='./updater'?{createUpdateService:()=>({getState:()=>({phase:'unsupported'}),dispose(){}})}:require(key),__dirname:path.resolve(__dirname,'../electron')});
 vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../electron/main.js'),'utf8'),context);
 const main=vm.runInContext('main',context),sender={sender:main.webContents};
 assert.equal(created,1);assert.ok(main.options.transparent);assert.equal(main.popupHandler().action,'deny');

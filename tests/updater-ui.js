@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');const assert=require('node:assert/strict'),path=require('path'),fs=require('fs');const {pathToFileURL}=require('url');
+(async()=>{const browser=await chromium.launch({channel:'chrome'});try{const page=await browser.newPage({viewport:{width:800,height:600}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.addInitScript(()=>{localStorage.clear();requestAnimationFrame=()=>0;window.__installs=0;window.__checks=0;window.SL={native:true,quit(){},minimize(){},updateState:async()=>({supported:true,phase:'current',automatic:true,version:null,currentVersion:'0.4.1',percent:0}),onUpdate:callback=>window.__update=callback,checkUpdates:async()=>{__checks++;return{supported:true,phase:'current',automatic:true}},setAutoUpdates:async automatic=>({supported:true,phase:'current',automatic}),installUpdate:async()=>{__installs++;return true},updateInstaller:()=>{window.__installer=true}}});
+await page.goto(pathToFileURL(path.resolve('index.html')).href);await page.waitForFunction(()=>typeof updateSettings==='function');
+await page.evaluate(()=>{CFG.vol=CFG.mus=0;openSettings('title');BT=[];render()});
+assert.ok(await page.evaluate(()=>BT.some(b=>b.x===72&&b.y===516)));
+await page.evaluate(()=>{__update({supported:true,phase:'downloading',automatic:true,version:'0.4.2',percent:67});BT=[];render()});assert.match(await page.evaluate(()=>updateLabel()),/67%/);assert.equal(await page.evaluate(()=>__installs),0);
+await page.evaluate(()=>{CFG.wm=0;newGame();__update({supported:true,phase:'ready',automatic:true,version:'0.4.2',percent:100});BT=[];render()});assert.equal(await page.evaluate(()=>S),'play');assert.equal(await page.evaluate(()=>__installs),0);
+await page.evaluate(()=>{openSettings('pause');BT=[];render()});
+const dir=path.resolve('../../backups/updater-qa-v0.4.1');fs.mkdirSync(dir,{recursive:true});await page.screenshot({path:path.join(dir,'settings-ready.png')});
+const position=await page.evaluate(()=>{const r=cv.getBoundingClientRect();return{x:r.left+190*r.width/W,y:r.top+534*r.height/H}});await page.mouse.click(position.x,position.y);assert.equal(await page.evaluate(()=>__installs),1);
+await page.evaluate(()=>{__update({supported:true,phase:'error',automatic:true});BT=[];render();updateAction()});await page.waitForTimeout(20);assert.equal(await page.evaluate(()=>__checks),1);
+await page.evaluate(()=>{__update({supported:false,phase:'unsupported',automatic:true});BT=[];render();updateAction()});assert.equal(await page.evaluate(()=>__installer),true);assert.deepEqual(errors,[]);console.log('Update UI: progress, no interrupted run, explicit restart, offline retry and portable installer action passed at 800x600.');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

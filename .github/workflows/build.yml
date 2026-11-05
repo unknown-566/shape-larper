@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
     tags: ['v*']
-    paths: ['index.html', 'desktop.js', 'menus.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
+    paths: ['index.html', 'desktop.js', 'menus.js', 'updates.js', 'electron/**', 'package.json', 'package-lock.json', '.github/workflows/build.yml']
 jobs:
   build:
     strategy:
@@ -27,10 +27,6 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run build:${{ matrix.target }}
-      - name: Zip (Windows)
-        if: matrix.target == 'win'
-        shell: pwsh
-        run: Compress-Archive -Path "dist/Shape Larper-win32-x64" -DestinationPath ShapeLarper-win-x64.zip
       - name: Zip (macOS)
         if: matrix.target == 'mac'
         run: ditto -c -k --keepParent "dist/Shape Larper-darwin-universal/Shape Larper.app" ShapeLarper-mac-universal.zip
@@ -40,9 +36,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: shape-larper-${{ matrix.target }}
-          path: ShapeLarper-*.zip
+          path: |
+            ShapeLarper-*.zip
+            dist/ShapeLarper-*.zip
+            dist/ShapeLarper-*.exe
+            dist/*.blockmap
+            dist/latest.yml
 
-  # every push to main replaces the "latest" release with fresh downloads
+  # Publish versioned assets, including the NSIS auto-update feed.
   release:
     if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     needs: build
@@ -61,12 +62,6 @@ jobs:
         run: |
           V=$(node -p "require('./package.json').version")
           # one release per version, so old versions stay downloadable
-          gh release view "v$V" >/dev/null 2>&1 || gh release create "v$V" out/*.zip --target "$GITHUB_SHA" --title "Shape Larper v$V" --notes "Shape Larper v$V. Windows: unzip and run Shape Larper.exe."
-          gh release delete latest --yes --cleanup-tag || true
-          gh release create latest out/*.zip --target "$GITHUB_SHA" --title "Shape Larper v$V (latest)" --notes "Windows: unzip ShapeLarper-win-x64.zip and run Shape Larper.exe. If SmartScreen warns, click More info, then Run anyway.
-
-          macOS: unzip and open Shape Larper.app. The app is unsigned: right-click it and choose Open, or run xattr -cr on it.
-
-          Linux: unzip and run the shape-larper binary.
-
-          Built from $GITHUB_SHA."
+          shopt -s globstar nullglob
+          assets=(out/**/*.zip out/**/*.exe out/**/*.blockmap out/**/latest.yml)
+          gh release view "v$V" >/dev/null 2>&1 || gh release create "v$V" "${assets[@]}" --target "$GITHUB_SHA" --latest --title "Shape Larper v$V" --notes "Windows: run the Setup installer to enable in-game automatic updates, or extract the portable ZIP. Built from $GITHUB_SHA."

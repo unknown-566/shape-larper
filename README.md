@@ -24,9 +24,10 @@ Open `index.html`. Windows mode works in desktop Chrome or Edge once pop-ups are
 
 The desktop app has full-size waves, no pop-up prompts, and aiming across the transparent surface. Alt-Tab pauses the run. Transparent space captures input while playing, so shooting does not click applications underneath. The app uses the current monitor's work area and responds to display/DPI changes.
 
-**Download:** [Releases → latest](https://github.com/unknown-566/shape-larper/releases/tag/latest)
+**Download:** [Releases → latest](https://github.com/unknown-566/shape-larper/releases/latest)
 
-- Windows: `ShapeLarper-win-x64.zip`. Unzip it and run `Shape Larper.exe`.
+- Windows installer: `ShapeLarper-Setup-vVERSION-win-x64.exe`. Install once to enable automatic updates.
+- Windows portable: `ShapeLarper-vVERSION-win-x64.zip`. Extract it and run `Shape Larper.exe`; this copy offers a link to the installer instead of replacing portable files.
 - macOS: `ShapeLarper-mac-universal.zip` (unsigned: right-click the app and choose Open).
 - Linux: `ShapeLarper-linux-x64.zip`.
 
@@ -35,11 +36,17 @@ Build it yourself (Node 22):
 ```bash
 npm install
 npm start            # run without packaging
-npm run build:win    # dist/Shape Larper-win32-x64/Shape Larper.exe
+npm run build:win    # dist/: Windows installer, ZIP, latest.yml and blockmap
 npm run build:mac    # dist/Shape Larper-darwin-universal/
 npm run build:linux  # dist/Shape Larper-linux-x64/
 ```
 
-GitHub Actions (`.github/workflows/build.yml`) builds all three on every push. Pushes to `main` also replace the `latest` release with fresh downloads.
+GitHub Actions (`.github/workflows/build.yml`) builds all three on every push to main. Releases include the Windows installer and its `latest.yml`/blockmap; publish these files together without renaming the installer. Versioned releases are preserved and the newest is marked as latest.
+
+## Automatic updates (Windows installer, v0.4.1+)
+
+The installed app checks GitHub Releases after launch and every four hours, and downloads newer stable versions in the background. It never restarts or installs during a run. When ready, use **Restart & update** in the main menu or **Pause → Settings**. Settings also provide a manual check and an automatic-updates toggle. Downloaded installers are verified against the release's SHA-512 checksum. Saves and preferences remain in the same user-data directory.
+
+Existing v0.4.0 ZIP copies cannot update themselves: install v0.4.1 once. Portable ZIPs and non-Windows builds do not self-install updates. The release pipeline must always upload the Setup EXE, its `.blockmap`, and `latest.yml` before publishing a release.
 
 The app is unsigned, so Windows SmartScreen may warn on first launch: click "More info", then "Run anyway".
