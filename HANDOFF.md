@@ -1,6 +1,10 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.2
+## Current implementation: v0.4.3
+
+effects.js adds bounded world impact rings/rays, panel corner highlights, and LAN impact events. CFG.impact defaults 1.35; settings offers 0/.6/1.35/2. CFG.shk and CFG.fl independently control motion/flashes. Desktop presentation wraps masks, world, frames and HUD in one translation (capped at 10 CSS px); desktopPre subtracts that translation for mouse aim. Menus do not shake. Containment reserves additional margin. Do not move OS windows or apply per-entity coordinate offsets. tests/impact-effects.js checks aim, unchanged simulation positions, one world draw, low-FX bounds and switches. native-coop.js also asserts effect delivery.
+
+## Previous implementation: v0.4.2
 
 LAN: electron/lan.js implements UDP discovery and bounded TCP frames (port 43871, protocol shape-larper-042). multiplayer.js handles two-player host-authoritative simulation and 30 Hz snapshots. Shared hull/pulse/upgrades; host resumes and chooses. Guest does not simulate. Run IDs reset reward checkpoints on retry. Only run-earned advancements replicate. Desktop co-op uses a common fixed arena; solo keeps scrolling. Disconnect ends the session; no host migration or reconnect-in-progress.
 

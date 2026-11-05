@@ -18,7 +18,8 @@ function settingsDraw(){
  btn('Graphics  ·  '+quality,508,198,380,46,cycleQuality,{sz:17});
  btn('Screen shake  ·  '+level(CFG.shk),508,254,380,46,change('shk'),{sz:17});
  btn('Flashes  ·  '+(CFG.fl?'On':'Off'),508,310,380,46,()=>{CFG.fl^=1;saveD()},{sz:17});
- T('LAYOUT',76,392,12,'#5ef2ff','left');T('Fits your display automatically',884,392,12,'#938aa9','right','normal');
+ btn('Impact effects · '+((CFG.impact??1.35)===0?'Off':(CFG.impact??1.35)===.6?'Soft':(CFG.impact??1.35)===2?'Overdrive':'Full'),72,364,380,32,()=>{const modes=[0,.6,1.35,2];CFG.impact=modes[(modes.indexOf(CFG.impact??1.35)+1)%modes.length];saveD()},{sz:14});
+ T('LAYOUT',76,402,12,'#5ef2ff','left');T('Fits your display automatically',884,402,12,'#938aa9','right','normal');
  btn('Panel size  ·  '+Math.round((CFG.panelScale||1)*100)+'%',72,414,380,46,()=>settingCycle('panelScale',[.85,1,1.15]),{sz:17});
  btn('Interface size  ·  '+Math.round((CFG.uiScale||1)*100)+'%',508,414,380,46,()=>settingCycle('uiScale',[.85,1,1.15]),{sz:17});
  if(NAT)btn('Minimize other windows · '+(CFG.clearDesktop!==false?'On':'Off'),508,470,380,30,()=>{CFG.clearDesktop=CFG.clearDesktop===false;saveD()},{sz:13});

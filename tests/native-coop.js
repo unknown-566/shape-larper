@@ -4,5 +4,6 @@ const assert=require('node:assert/strict'),path=require('node:path'),os=require(
  for(const app of apps)assert.equal(await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);for(const p of pages)assert.equal(await p.evaluate(()=>DESKTOPMODE),1);
  // A second run must reset the guest's reward checkpoint, without reconnecting.
  const old=await b.evaluate(()=>NET.runId);await a.evaluate(()=>retry());await b.waitForFunction(old=>NET.runId!==old,old);await a.evaluate(()=>{earn(20);S='pause'});await b.waitForFunction(()=>NET.reward===20);
+ await a.evaluate(()=>impact('boss',480,200,'#ff4fa3'));await b.waitForFunction(()=>IMPACTS.some(q=>q.kind==='boss'));
  assert.deepEqual(errors,[]);console.log('PASS: two native Electron apps, real discovery/IPC/TCP, desktop co-op, shared pause, retry reward reset, one window each');
  }finally{for(const app of apps.reverse())await app.close()}})().catch(e=>{console.error(e);process.exitCode=1});

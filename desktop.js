@@ -36,7 +36,7 @@ function desktopPre(){
  const layout=desktopLayout();CX=layout.player.x+layout.player.w/2;CY=layout.player.y+layout.player.h/2;if(NET.connected){CX=innerWidth/2;CY=innerHeight/2}
  // Scale the world with available height, preserving the same combat distances.
  WSC=cl(Math.min(innerWidth/W,innerHeight/H)*.9,.3,4);
- if(desktopPointer.seen&&P){M.x=desktopCamera().x+(desktopPointer.x-CX)/WSC;M.y=desktopCamera().y+(desktopPointer.y-CY)/WSC}
+ if(desktopPointer.seen&&P){const j=desktopShake();M.x=desktopCamera().x+(desktopPointer.x-CX-j.x)/WSC;M.y=desktopCamera().y+(desktopPointer.y-CY-j.y)/WSC}
 }
 // A clamped panel must never conceal its own enemy. Clamp the simulation too,
 // using world coordinates derived from this monitor's actual canvas transform.
@@ -44,7 +44,7 @@ function desktopContain(){
  if(!DESKTOPMODE||!P||NET.role==='guest')return;
  desktopPre();
  for(const e of [...E,...(boss?[boss]:[])]){
-  const margin=(e.r||16)+8;if(NET.connected){e.x=cl(e.x,margin,W-margin);e.y=cl(e.y,margin,H-margin);continue}
+  const margin=(e.r||16)+8+12/WSC;if(NET.connected){e.x=cl(e.x,margin,W-margin);e.y=cl(e.y,margin,H-margin);continue}
   const minX=P.x+(8-CX)/WSC+margin,maxX=P.x+(innerWidth-8-CX)/WSC-margin;
   const minY=P.y+((e===boss?80:8)-CY)/WSC+margin,maxY=P.y+(innerHeight-8-CY)/WSC-margin;
   if(minX<=maxX)e.x=cl(e.x,minX,maxX);
@@ -94,7 +94,7 @@ function desktopHud(panel,layout){
 }
 function desktopRender(){
  const layout=desktopLayout();g=g0;CW=1;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.setTransform(DK,0,0,DK,0,0);
- desktopPre();desktopContain();desktopRects=desktopPanels(layout);
+ desktopPre();desktopContain();desktopRects=desktopPanels(layout);const j=desktopShake();g.save();g.translate(j.x,j.y);
  // All panels share this single world draw. The transparent gaps are outside
  // the clipping region, so neither background nor bullets are painted there.
  g.save();g.beginPath();for(const r of desktopRects)g.rect(r.x,r.y,r.w,r.h);g.clip();
@@ -111,6 +111,7 @@ function desktopRender(){
  desktopHud(player,layout);
  if(boss){const scale=cl(layout.panelScale,.65,1.4),w=Math.min(layout.width-32,520*scale),h=64*scale;g.save();g.translate((layout.width-w)/2,12);g.scale(w/520,h/64);bossBar(desktopBar,520,64);g.restore()}
  if(flash>0&&CFG.fl){g.save();g.beginPath();for(const r of desktopRects)g.rect(r.x,r.y,r.w,r.h);g.clip();g.fillStyle=`rgba(${FLC},${flash*.35})`;g.fillRect(0,0,layout.width,layout.height);g.restore()}
+ for(const r of desktopRects)impactFrame(r.x,r.y,r.w,r.h,r.kind==='p'?(P.ih>0?'#ff387b':'#7befff'):r.e?.c||'#bd8cff');g.restore();
  if(S!='play'){g.fillStyle='#04030ab8';g.fillRect(0,0,layout.width,layout.height)}
  g.save();g.translate(layout.ux,layout.uy);g.scale(layout.ui,layout.ui);
  if(S=='play'){banDraw();toastDraw();progressHud()}else{overlays();toastDraw();tipDraw()}

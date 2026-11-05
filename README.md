@@ -8,6 +8,10 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
+## v0.4.3: impact effects
+
+Stronger shared panel shake, expanding shockwaves, radial sparks and illuminated panel corners on dash, kills, damage, pulses and boss phases/deaths. Settings offers Impact effects: Off / Soft / Full / Overdrive. Screen shake and Flashes remain independent switches. Low graphics caps simultaneous impact bursts at eight and reduces ray counts. LAN forwards impact events to the other pilot. The native desktop window remains stationary; the compositor moves panel masks, world and chrome together and compensates aim coordinates.
+
 ## v0.4.2: LAN co-op, credits and the hangar
 
 Open **LAN co-op** on two desktop copies of v0.4.2 on the same network. One player chooses **Host game**; the other selects the automatically discovered lobby. **Join by IP** works when broadcasts are filtered. Allow the game on private networks in Windows Firewall (UDP discovery and TCP gameplay, port 43871). No internet matchmaking or port forwarding is needed.
