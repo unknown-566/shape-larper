@@ -1,6 +1,10 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.6
+## Current implementation: v0.4.7
+
+boss-pressure.js loaded before boot.js adds bossPressure at the end of bossUpd. Per-pilot normalized movement continuity (dot>.96, hold1.15s), initial cooldown2.6s then4.8-.4*phase, no cutoffs during shield/intro/charge/absorb or existing LZ. Projects dominant movement axis1.04s ahead, locks a standard .9s warning/.35s beam into LZ with cutoff flag; existing shift/snapshot/pulse/collision paths handle it. Amber full-width warning rendering. NET.other now records authoritative normalized mvx/mvy; alternate eligible pilots. No new protocol required (045). tests/boss-pressure.js checks four cardinal + diagonal kiting with real wmShift/lzUpd, reversal safety, all eight bosses, guest target, locked serialization, shield/stationary suppression.
+
+## Previous implementation: v0.4.6
 
 soundtrack.js loads before boot.js and populates SONGS; shared audio building blocks/mTick remain in index.html. Four original arrangements share eight-bar motif variants and a 32-bar form; melody is not gated by enemy count. stringNote uses deterministic Karplus-style cached buffers (96 maximum), electricKeys uses FM, shaker uses shared noise. No external media dependencies. Initial delay timing and cancelled pending song transitions corrected. tests/soundtrack.js renders all four complete forms through OfflineAudioContext and exports a 32-second wave preview, checking finite audio, peak/RMS, bounded cache and muted scheduling. Protocol remains045; no relay update needed.
 

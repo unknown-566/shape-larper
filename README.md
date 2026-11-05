@@ -8,6 +8,10 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
+## v0.4.7: bosses intercept straight-line escapes
+
+All eight bosses now recognize sustained movement in one direction and occasionally mark a lane ahead of that path. The amber warning shows the full beam width for 0.9 seconds, then fires at its locked position. Reverse, stop before the lane, dash or pulse to respond; the warning never tracks you after it appears. The counter has a 4–4.8 second cooldown, avoids existing laser attacks and charge/absorb animations, and targets either co-op pilot. Existing boss-specific patterns remain intact. Network protocol stays 045.
+
 ## v0.4.6: original melodic soundtrack
 
 Four related tracks — Afterglow (menu), Neon Run (waves), No Way Back (bosses), Last Light (finale) — share an original eight-bar motif. Melody starts immediately even in quiet waves, with 32-bar arrangements, variations, choruses, breakdowns and drum turnarounds. Plucked-string textures and electric keys sit over syncopated bass and percussion. Paused/upgrade moments retain a softer melodic arrangement. No third-party recordings or copied melodies are included.

@@ -246,6 +246,7 @@ function bossUpd(){const b=boss,f=b.hp/b.mhp;b.t+=dt;b.hit-=dt;b.sh-=dt;if(b.big
    if(tk('o',.28)){b.sp+=.5;eb(b.x,b.y,b.sp,150,4,'#ffe14a')}
    if(f<.5&&tk('l',3.6)){las(P.x,0);las(P.y,1)}
    if(f<.3&&tk('e',7))spawn(6,b.x,b.y+60)}}
+ bossPressure(b);
  if(P.dt>0&&!(P.ph>0)&&dist(b,P)<b.r+P.r)P.dt=0;if(P.inv<=0&&dist(b,P)<b.r+P.r*.7)hurt()}
 
 function upd(){if(NET.role==='guest'&&NET.connected)return;netPlayerStep();
@@ -314,7 +315,7 @@ function drawWorld(){
    for(let i=0;i<3;i++){poly(b.x,b.y,b.r*(1-i*.27),[6,8,5,7,3,10,9,12][b.n],b.t*(i%2?1:-1)*.6+i);g.fillStyle=i==2?(b.hit>0?'#fff':b.c):b.c+'22';g.fill();g.stroke()}
    g.restore()}
   const X0=VW?VW.x0:0,X1=VW?VW.x1:W,Y0=VW?VW.y0:0,Y1=VW?VW.y1:H;
-  g.shadowBlur=0;for(const z of BR){const w=z.t<.7;g.globalAlpha=w?.3+.3*Math.sin(t*40):1;g.fillStyle='#ffe14a';if(w)g.fillRect(X0,Y0+4,X1-X0,6);else{g.fillRect(X0,z.y,X1-X0,z.h);g.fillStyle='#3a2a00';for(let x=Math.floor(X0/40)*40;x<X1;x+=40)g.fillRect(x,z.y+8,20,10)}}g.globalAlpha=1;for(const z of LZ){const on=z.t>.9;g.globalAlpha=on?1:.25+.2*Math.sin(t*50);g.fillStyle=on?'#fff':'#ff3355';const w=on?44:4;z.h?g.fillRect(X0,z.p-w/2,X1-X0,w):g.fillRect(z.p-w/2,Y0,w,Y1-Y0)}g.globalAlpha=1;g.globalCompositeOperation='lighter';
+  g.shadowBlur=0;for(const z of BR){const w=z.t<.7;g.globalAlpha=w?.3+.3*Math.sin(t*40):1;g.fillStyle='#ffe14a';if(w)g.fillRect(X0,Y0+4,X1-X0,6);else{g.fillRect(X0,z.y,X1-X0,z.h);g.fillStyle='#3a2a00';for(let x=Math.floor(X0/40)*40;x<X1;x+=40)g.fillRect(x,z.y+8,20,10)}}g.globalAlpha=1;for(const z of LZ){const on=z.t>.9;if(z.cutoff&&!on){g.globalAlpha=.12;g.fillStyle='#ffbd69';z.h?g.fillRect(X0,z.p-22,X1-X0,44):g.fillRect(z.p-22,Y0,44,Y1-Y0)}g.globalAlpha=on?1:.25+.2*Math.sin(t*50);g.fillStyle=on?'#fff':z.cutoff?'#ffbd69':'#ff3355';const w=on?44:4;z.h?g.fillRect(X0,z.p-w/2,X1-X0,w):g.fillRect(z.p-w/2,Y0,w,Y1-Y0)}g.globalAlpha=1;g.globalCompositeOperation='lighter';
   for(const b of B){if(!vis(b.x,b.y,b.r*3))continue;if(!b.h){g.strokeStyle=b.c;g.globalAlpha=.45;g.lineWidth=b.r*1.1;g.beginPath();g.moveTo(b.x,b.y);g.lineTo(b.x-b.vx*.025,b.y-b.vy*.025);g.stroke();g.globalAlpha=1}g.fillStyle=b.c;g.globalAlpha=.28;circ(b.x,b.y,b.r*2.1);g.globalAlpha=1;circ(b.x,b.y,b.r*.8);if(b.h){g.fillStyle='#fff';circ(b.x,b.y,b.r*.4)}if(b.ty==1){g.strokeStyle='#ffe08a';g.lineWidth=2.5;g.beginPath();g.arc(b.x,b.y,b.r+3,0,7);g.stroke()}if(b.ty==2){g.strokeStyle='#fff';g.fillStyle='#ff1744';g.lineWidth=2.5;poly(b.x,b.y,b.r+5,4,t*6);g.fill();g.stroke()}}
   for(const p of PT){if(!vis(p.x,p.y,4))continue;g.globalAlpha=p.l/p.m;g.fillStyle=p.c;if(p.k){g.strokeStyle=p.c;g.lineWidth=2;g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x-p.vx*.04,p.y-p.vy*.04);g.stroke()}else g.fillRect(p.x-2,p.y-2,4,4)}
   g.globalAlpha=1;
@@ -557,7 +558,7 @@ function wmBounds(){if(!WM||!P||NET.connected){BX0=0;BX1=W;BY0=0;BY1=H;QX0=QY0=-
  BX0=P.x+(s.x-CX)/WSC;BX1=P.x+(s.x+s.w-CX)/WSC;BY0=P.y+(s.y-CY)/WSC;BY1=P.y+(s.y+s.h-CY)/WSC;QX0=Math.min(-30,BX0-40);QX1=Math.max(W+30,BX1+40);QY0=Math.min(-30,BY0-40);QY1=Math.max(H+30,BY1+40)}
 
 /* v0.3: version, advancements, new enemies, living windows */
-const VER='0.4.6';
+const VER='0.4.7';
 
 /* advancements: unlocked once, saved between runs, announced with a toast */
 const ADV=[
@@ -806,5 +807,5 @@ function statusDraw(){g.fillStyle='#07060f';g.fillRect(0,0,W,H);T('SHAPE LARPER'
  btn(S=='pause'?'Resume':'Pause',W/2-130,330,260,46,()=>{S=S=='pause'?'play':S=='play'?'pause':S});btn('End run',W/2-130,390,260,46,toMenu)}
 addEventListener('pagehide',wmStop);
 
-</script><script src="desktop.js"></script><script src="updates.js"></script><script src="menus.js"></script><script src="multiplayer.js"></script><script src="progression.js"></script><script src="effects.js"></script><script src="relay-client.js"></script><script src="soundtrack.js"></script>
+</script><script src="desktop.js"></script><script src="updates.js"></script><script src="menus.js"></script><script src="multiplayer.js"></script><script src="progression.js"></script><script src="effects.js"></script><script src="relay-client.js"></script><script src="boss-pressure.js"></script><script src="soundtrack.js"></script>
 <script src="boot.js"></script></body></html>

@@ -34,7 +34,7 @@ async function handleNetEvent(e){
  }
 }
 if(window.SL?.onLan)SL.onLan(handleNetEvent);
-function netPlayerStep(){const q=NET.other;if(!NET.connected||NET.role!=='host'||!q)return;const i=!PICK.active&&t-(NET.input.at||0)<.3?NET.input:{};const ml=Math.max(1,Math.hypot(i.x||0,i.y||0)),mx=(i.x||0)/ml,my=(i.y||0)/ml;q.dash-=dt;q.cd-=dt;q.inv-=dt;
+function netPlayerStep(){const q=NET.other;if(!NET.connected||NET.role!=='host'||!q)return;const i=!PICK.active&&t-(NET.input.at||0)<.3?NET.input:{};const ml=Math.max(1,Math.hypot(i.x||0,i.y||0)),mx=(i.x||0)/ml,my=(i.y||0)/ml;q.mvx=mx;q.mvy=my;q.dash-=dt;q.cd-=dt;q.inv-=dt;
  if(i.dash&&q.dash<=0){q.dash=1.1*U.dashCd;q.dt=.17+(U.hyper?.06:0);q.dx=mx||my?mx:Math.cos(Math.atan2(i.ay-q.y,i.ax-q.x));q.dy=mx||my?my:Math.sin(Math.atan2(i.ay-q.y,i.ax-q.x));impact('dash',q.x,q.y,SKINS.find(s=>s[0]===NET.skin)?.[2]||'#5ef2ff');q.inv=U.hyper?.5:.3;if(U.shock)for(let j=0;j<8+U.shock*4;j++)pb(q.x,q.y,j*2*PI/(8+U.shock*4))}
  const speed=q.dt>0?820:255*U.speed;q.x=cl(q.x+(q.dt>0?q.dx:mx)*speed*dt,12,W-12);q.y=cl(q.y+(q.dt>0?q.dy:my)*speed*dt,12,H-12);q.dt-=dt;q.a=Math.atan2((i.ay||0)-q.y,(i.ax||0)-q.x);
  if(i.fire&&q.cd<=0){q.cd=.19/U.rate;for(let j=0;j<U.multi;j++)pb(q.x,q.y,q.a+(j-(U.multi-1)/2)*.13);for(let j=0;j<U.rear;j++)pb(q.x,q.y,q.a+PI+(j%2?1:-1)*Math.ceil(j/2)*.2)}

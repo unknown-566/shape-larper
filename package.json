@@ -1,7 +1,7 @@
 {
   "name": "shape-larper",
   "productName": "Shape Larper",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Bullet hell roguelite with synchronized transparent desktop panels",
   "main": "electron/main.js",
   "private": true,
@@ -42,7 +42,8 @@
       "effects.js",
       "relay-client.js",
       "boot.js",
-      "soundtrack.js"
+      "soundtrack.js",
+      "boss-pressure.js"
     ],
     "publish": [
       {
