@@ -1,6 +1,16 @@
 # Shape Larper: handoff
 
-## Current implementation: v0.4.4
+## Current implementation: v0.4.5
+
+Co-op desktopLayout uses a fixed shared W×H arena fitted inside the available viewport, with header/footer margin. CX/CY use this panel center on both clients; solo retains soft following. tests/coop-movement.js uses real keyboard events for each pilot across 800×600 and 1920×1080 and tests leaving the bottom edge. It also catches startup page errors. boot.js is loaded LAST and starts scheduling only after every module loads; preserve this order in all builds.
+
+Boss HUD uses drawCompactBossBar: small name/percent chips, segmented rail, exact HP/phase on hover. desktopBossAnchor keeps spring following and above/below hysteresis. Classic uses the same design.
+
+electron/displays.js persists monitor id in userData/display.json, validates selections, positions desktop in workArea and menu within bounds, handles unplug/metrics changes. Settings cycles monitors with physical resolution labels; each co-op client selects independently. tests/displays.js mocks two monitors, negative origins and unplug. Native integration verifies real enumeration/selection on the available monitor; physical dual-monitor hardware was not tested. Guest settings remain open while authoritative state is pause.
+
+Both clients and relay use shape-larper-045.
+
+## Previous implementation: v0.4.4
 
 User requested relay prepared for deployment (no hosting account), not a live public service. relay/server.js + own pinned ws dependency/lock implement authenticated optional-key WebSocket rooms, bounds/rate/backpressure, heartbeat and cleanup. render.yaml is a free-plan Node service with generated access key; Docker is an alternative. relay-client.js connects from renderer using WSS (plain WS loopback tests only). netSend routes to relay or existing LAN; event handling shared in handleNetEvent(). LAN protocol bumped to shape-larper-044. Root Windows build excludes server deps. Release also includes a small relay-source ZIP; never include relay/node_modules. No cloud deployment or school-network testing was performed.
 

@@ -1,6 +1,9 @@
 const {contextBridge,ipcRenderer}=require('electron');
 contextBridge.exposeInMainWorld('SL',{
  native:true,
+ displays:()=>ipcRenderer.invoke('sl:displays'),
+ selectDisplay:id=>ipcRenderer.invoke('sl:display-select',id),
+ onDisplays:callback=>ipcRenderer.on('sl:displays',(_,state)=>callback(state)),
  clearDesktop:()=>ipcRenderer.invoke('sl:clear-desktop'),
  lan:(action,value)=>ipcRenderer.invoke('sl:lan',action,value),
  lanSend:message=>ipcRenderer.send('sl:lan-send',message),

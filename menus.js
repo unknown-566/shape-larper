@@ -1,5 +1,9 @@
-let SETTINGS_RETURN='title';
-function openSettings(back='title'){SETTINGS_RETURN=back;S='set';M.d=M.r=0;cf=0}
+let SETTINGS_RETURN='title',DISPLAY_STATE={selected:null,displays:[]},DISPLAY_BUSY=false;
+async function refreshDisplays(){if(!window.SL?.displays)return;try{DISPLAY_STATE=await SL.displays()}catch{}}
+if(window.SL?.onDisplays)SL.onDisplays(state=>{DISPLAY_STATE=state;fit();resetDesktopMotion()});
+async function cycleDisplay(){if(DISPLAY_BUSY||!DISPLAY_STATE.displays.length)return;const items=DISPLAY_STATE.displays,index=items.findIndex(d=>d.id===DISPLAY_STATE.selected);DISPLAY_BUSY=true;try{DISPLAY_STATE=await SL.selectDisplay(items[(index+1)%items.length].id);fit();resetDesktopMotion()}catch{await refreshDisplays()}finally{DISPLAY_BUSY=false}}
+function monitorLabel(){const d=DISPLAY_STATE.displays.find(d=>d.id===DISPLAY_STATE.selected);return DISPLAY_BUSY?'Moving to monitor…':d?'Monitor '+(DISPLAY_STATE.displays.indexOf(d)+1)+' · '+d.name.slice(0,14)+' · '+d.width+' × '+d.height:'Monitor · detecting…'}
+function openSettings(back='title'){refreshDisplays();SETTINGS_RETURN=back;S='set';M.d=M.r=0;cf=0}
 function settingsBack(){S=SETTINGS_RETURN;cf=0;M.d=M.r=0}
 function resumeGame(){S='play';M.d=M.r=0;for(const k in K)K[k]=0}
 function menuPanel(x,y,w,h){g.fillStyle='#0b091bea';g.strokeStyle='#393052';g.lineWidth=1.5;g.beginPath();g.roundRect(x,y,w,h,16);g.fill();g.stroke()}
@@ -23,7 +27,7 @@ function settingsDraw(){
  btn('Panel size  ·  '+Math.round((CFG.panelScale||1)*100)+'%',72,414,380,46,()=>settingCycle('panelScale',[.85,1,1.15]),{sz:17});
  btn('Interface size  ·  '+Math.round((CFG.uiScale||1)*100)+'%',508,414,380,46,()=>settingCycle('uiScale',[.85,1,1.15]),{sz:17});
  if(NAT)btn('Minimize other windows · '+(CFG.clearDesktop!==false?'On':'Off'),508,470,380,30,()=>{CFG.clearDesktop=CFG.clearDesktop===false;saveD()},{sz:13});
- T(DESKTOPMODE?Math.round(innerWidth)+' × '+Math.round(innerHeight)+' · Desktop':CFG.wm?'Desktop layout · adaptive':'Classic · 960 × 640 arena',76,UPDATE_API?477:496,13,'#b1a6cc','left','normal');
+ if(window.SL?.displays)btn(monitorLabel(),72,470,380,30,cycleDisplay,{sz:13});else T(DESKTOPMODE?Math.round(innerWidth)+' × '+Math.round(innerHeight)+' · Desktop':CFG.wm?'Desktop layout · adaptive':'Classic · 960 × 640 arena',76,UPDATE_API?477:496,13,'#b1a6cc','left','normal');
  updateSettings();
  if(SETTINGS_RETURN=='title')btn(cf?'Confirm reset':'Reset progress',666,516,222,40,()=>{if(!cf){cf=1;return}SEEN={};ADVS={};hi=0;WALLET={coins:0,earned:0,skins:['signal'],skin:'signal'};walletSave();localStorage.removeItem('ng_adv');localStorage.removeItem('ng_hi');cf=0;saveD()},{c:'#ff849c',sz:15});
  else T('Your changes are saved immediately.',76,UPDATE_API?574:548,13,'#9288a9','left','normal');

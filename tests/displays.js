@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');const {createDisplays}=require('../electron/displays');
+const dir=fs.mkdtempSync(path.join(os.tmpdir(),'shape-displays-'));let desktop=false,events=[];
+let monitors=[{id:1,label:'Main',workArea:{x:0,y:0,width:1920,height:1040},size:{width:1920,height:1080},scaleFactor:1},{id:2,label:'Left',workArea:{x:-1280,y:0,width:1280,height:720},size:{width:1280,height:720},scaleFactor:1.25}];
+const win={bounds:{x:200,y:200,width:960,height:640},getBounds(){return this.bounds},setBounds(b){this.bounds={...b}},isDestroyed:()=>false,webContents:{send:(...args)=>events.push(args)}};
+const screen={getAllDisplays:()=>monitors,getDisplayNearestPoint:()=>monitors[0],getCursorScreenPoint:()=>({x:0,y:0}),getDisplayMatching:bounds=>monitors.find(m=>bounds.x>=m.workArea.x&&bounds.x<m.workArea.x+m.workArea.width)||monitors[0]};
+const options={app:{getPath:()=>dir},screen,getWindow:()=>win,isDesktop:()=>desktop};let controller=createDisplays(options);
+assert.equal(controller.list().displays.length,2);controller.select(2);assert.ok(win.bounds.x<0&&win.bounds.x+win.bounds.width<=0);assert.equal(controller.list().selected,2);assert.throws(()=>controller.select(99),/no longer/);
+controller=createDisplays(options);assert.equal(controller.current().id,2);desktop=true;controller.select(2);assert.deepEqual(win.bounds,monitors[1].workArea);
+monitors=[monitors[0]];controller.sync();assert.deepEqual(win.bounds,monitors[0].workArea);assert.equal(controller.list().selected,1);assert.ok(events.some(e=>e[0]==='sl:displays'));desktop=false;controller.select(1);assert.equal(win.bounds.width,960);assert.equal(win.bounds.height,640);
+console.log('PASS: monitor enumeration, selection, negative coordinates, persistence, desktop bounds, unplug fallback and menu restoration');

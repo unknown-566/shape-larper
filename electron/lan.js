@@ -1,6 +1,6 @@
 // LAN discovery is deliberately local; gameplay uses one bounded TCP stream.
 const dgram=require('node:dgram'),net=require('node:net'),os=require('node:os');
-const PORT=43871,PROTO='shape-larper-044',MAX=512*1024;
+const PORT=43871,PROTO='shape-larper-045',MAX=512*1024;
 function createLan({notify=()=>{},port=PORT}={}){
  let udp,server,peer,timer,role='',rooms=new Map(),last=0;
  const emit=(type,data={})=>notify({type,...data});

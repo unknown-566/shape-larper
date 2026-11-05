@@ -4,6 +4,7 @@ const assert=require('node:assert/strict'),path=require('node:path'),os=require(
  for(const app of apps)assert.equal(await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().length),1);for(const p of pages)assert.equal(await p.evaluate(()=>DESKTOPMODE),1);
  // A second run must reset the guest's reward checkpoint, without reconnecting.
  const old=await b.evaluate(()=>NET.runId);await a.evaluate(()=>retry());await b.waitForFunction(old=>NET.runId!==old,old);await a.evaluate(()=>{earn(20);S='pause'});await b.waitForFunction(()=>NET.reward===20);
+ const displayState=await a.evaluate(()=>SL.displays());assert.ok(displayState.displays.length);await a.evaluate(id=>SL.selectDisplay(id),displayState.selected);await b.evaluate(()=>openSettings('pause'));await b.waitForTimeout(150);assert.equal(await b.evaluate(()=>S),'set');await b.evaluate(()=>settingsBack());
  await a.evaluate(()=>impact('boss',480,200,'#ff4fa3'));await b.waitForFunction(()=>IMPACTS.some(q=>q.kind==='boss'));
  await a.evaluate(()=>{S='play';advance()});await a.waitForFunction(()=>PICK.scale===0&&S==='pick');await b.waitForFunction(()=>PICK.scale===0&&S==='pick');await b.evaluate(()=>choose(0));await a.waitForFunction(()=>PICK.chosen);await a.evaluate(()=>deferPicks());await b.waitForFunction(()=>S==='play');
  assert.deepEqual(errors,[]);console.log('PASS: two native Electron apps via '+(relay?'WebSocket relay':'LAN TCP')+', desktop co-op, two-player menu/guest choice, pause, retry rewards, one window each');

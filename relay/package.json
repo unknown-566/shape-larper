@@ -1,6 +1,6 @@
 {
   "name": "shape-larper-relay",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "private": true,
   "description": "Two-player WebSocket room relay for Shape Larper",
   "main": "server.js",

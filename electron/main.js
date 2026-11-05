@@ -10,9 +10,12 @@ ipcMain.handle('sl:lan',async(event,action,value)=>{if(!trusted(event))return;tr
 ipcMain.on('sl:lan-send',(event,message)=>{if(trusted(event))lan.send(message)});
 ipcMain.handle('sl:clear-desktop',async event=>{if(!trusted(event)||process.platform!=='win32')return false;return new Promise(resolve=>{require('node:child_process').execFile('powershell.exe',['-NoProfile','-NonInteractive','-Command','(New-Object -ComObject Shell.Application).MinimizeAll()'],{windowsHide:true,timeout:5000},error=>{if(main&&!main.isDestroyed()){main.restore();main.show();main.focus()}resolve(!error)})})});
 let main=null,desktop=false,menuBounds=null,displayId=null;
+const displays=require('./displays').createDisplays({app,screen,getWindow:()=>main,isDesktop:()=>desktop,onSelected:display=>{displayId=desktop?display.id:null;menuBounds=displays.menuRect(display.workArea)}});
+ipcMain.handle('sl:displays',event=>trusted(event)?displays.list():null);
+ipcMain.handle('sl:display-select',(event,id)=>{if(!trusted(event))throw Error('Unknown window');return displays.select(id)});
 function menuRect(area){const width=Math.min(960,area.width),height=Math.min(640,area.height);return{x:area.x+Math.round((area.width-width)/2),y:area.y+Math.round((area.height-height)/2),width,height}}
 function createMain(){
- const display=screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+ const display=displays.current();
  main=new BrowserWindow({...menuRect(display.workArea),frame:false,transparent:true,backgroundColor:'#00000000',thickFrame:false,hasShadow:false,resizable:false,maximizable:false,fullscreenable:false,show:false,title:'Shape Larper v'+app.getVersion(),autoHideMenuBar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,backgroundThrottling:false}});
  main.setMenu(null);main.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  main.once('ready-to-show',()=>main.show());
@@ -23,7 +26,7 @@ function createMain(){
 const trusted=event=>main&&!main.isDestroyed()&&event.sender===main.webContents;
 ipcMain.handle('sl:desktop',(event,enabled)=>{
  if(!trusted(event))throw new Error('Unknown window');
- const display=screen.getDisplayMatching(main.getBounds());
+ const display=displays.current();
  main.hide();
  if(enabled){if(!desktop)menuBounds=main.getBounds();desktop=true;displayId=display.id;main.setBounds(display.workArea,false)}
  else{desktop=false;displayId=null;const area=display.workArea;const b=menuBounds||menuRect(area);const width=Math.min(b.width,area.width),height=Math.min(b.height,area.height);main.setBounds({x:Math.max(area.x,Math.min(b.x,area.x+area.width-width)),y:Math.max(area.y,Math.min(b.y,area.y+area.height-height)),width,height},false)}
@@ -37,7 +40,7 @@ ipcMain.handle('sl:update-check',event=>trusted(event)?updates?.check():null);
 ipcMain.handle('sl:update-auto',(event,value)=>trusted(event)?updates?.setAutomatic(value):null);
 ipcMain.handle('sl:update-install',event=>trusted(event)?updates?.install():false);
 ipcMain.on('sl:update-installer',event=>{if(trusted(event))shell.openExternal('https://github.com/unknown-566/shape-larper/releases/latest')});
-function displayChanged(){if(!desktop||!main)return;const display=screen.getAllDisplays().find(d=>d.id===displayId)||screen.getDisplayMatching(main.getBounds());displayId=display.id;main.setBounds(display.workArea,false)}
-app.whenReady().then(()=>{createMain();updates=createUpdateService({app,notify:state=>{if(main&&!main.isDestroyed())main.webContents.send('sl:update',state)}});screen.on('display-metrics-changed',displayChanged);screen.on('display-removed',displayChanged)});
+function displayChanged(){displays.sync()}
+app.whenReady().then(()=>{createMain();updates=createUpdateService({app,notify:state=>{if(main&&!main.isDestroyed())main.webContents.send('sl:update',state)}});screen.on('display-metrics-changed',displayChanged);screen.on('display-removed',displayChanged);screen.on('display-added',displayChanged)});
 app.on('before-quit',()=>{updates?.dispose();lan.leave()});
 app.on('window-all-closed',()=>app.quit());

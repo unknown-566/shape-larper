@@ -8,13 +8,21 @@ Two ways to play:
 - **Desktop** (desktop app): one transparent window covers the current monitor's work area. Player, enemy and boss panels are drawn together. Bullets are visible inside panels and hidden in the transparent gaps, with continuous world-space movement and collisions.
 - **Windows** (browser fallback): separate pop-up windows for the player and enemies.
 
-## v0.4.4: co-op menus and online relay
+## v0.4.5: stable co-op arena and monitor selection
+
+- Desktop co-op uses one fixed, fully visible shared arena on both clients, including different monitor resolutions. Neither pilot moves the panel. Both pilots spawn together and can leave every screen edge.
+- Settings → Monitor cycles connected displays and shows their resolution. Selection is saved; unplugging the selected display moves the game to an available display. Each pilot chooses independently.
+- Boss health uses a name/percentage chip and thin segmented rail anchored above or below the boss. Hover reveals exact HP and phase without reserving a large panel.
+- Renderer starts after all modules load, preventing intermittent startup errors. Guest settings stay open while the team is paused.
+- Both players and the relay must use **v0.4.5** (protocol shape-larper-045).
+
+## Co-op menus and online relay
 
 - Upgrade points open the card menu automatically. The world eases into slow motion, then freezes once both pilots have received the menu. Either pilot can choose the single team upgrade; play resumes after both finish or defer. Card descriptions, stat previews and costs have separate areas. Hover lifts, tilts and highlights cards.
 - The player panel follows movement with a soft lag; its upgrade control and credit readout travel with it. The boss health bar springs toward the boss, appears in front of panel chrome, and moves below the boss when the player is above it. It remains on-screen. Desktop wave announcements use a compact top banner.
-- **Online · room code** adds outbound WebSocket relay transport alongside LAN. Both players must run v0.4.4. No public relay is bundled or running: deploy the included server, then enter its WSS address and access key in the game. The host creates a room; the second pilot enters its code.
+- **Online · room code** adds outbound WebSocket relay transport alongside LAN. Both players must run v0.4.5. No public relay is bundled or running: deploy the included server, then enter its WSS address and access key in the game. The host creates a room; the second pilot enters its code.
 
-**Deployment:** [Czech relay guide](relay/README.md), `render.yaml`, Dockerfile and the `ShapeLarper-Relay-v0.4.4.zip` release asset. The server was tested locally with browser and Electron clients, including room pairing and synchronized menus; cloud deployment and your school network still require verification. Outbound WSS avoids relying on incoming LAN connections, but a network can also block WSS or the hosting domain. Do not assume any transport works on every network.
+**Deployment:** [Czech relay guide](relay/README.md), `render.yaml`, Dockerfile and the `ShapeLarper-Relay-v0.4.5.zip` release asset. The server was tested locally with browser and Electron clients, including room pairing and synchronized menus; cloud deployment and your school network still require verification. Outbound WSS avoids relying on incoming LAN connections, but a network can also block WSS or the hosting domain. Do not assume any transport works on every network.
 
 ## v0.4.3: impact effects
 

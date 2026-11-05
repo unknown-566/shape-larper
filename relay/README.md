@@ -1,4 +1,4 @@
-# Relay pro Shape Larper v0.4.4
+# Relay pro Shape Larper v0.4.5
 
 Tento adresář je **připravený k nasazení, veřejný server zatím neběží**. Oba hráči se připojují ven přes WSS (TLS, obvykle port 443). Nepotřebují příchozí spojení, UDP broadcast ani přesměrování portů na svých počítačích. Pokud síť blokuje i WebSocket nebo doménu hostingu, připojení stále nemusí fungovat.
 
